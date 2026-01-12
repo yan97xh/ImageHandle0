@@ -1,0 +1,205 @@
+﻿<UserControl
+    x:Class="ImageHandle.UserControls.FloodFillUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ImageHandle.UserControls"
+    xmlns:vm="clr-namespace:ImageHandle.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:cvert="clr-namespace:ImageHandle.Converters"
+    Width="1450"
+    Height="840"
+    d:DesignHeight="840"
+    d:DesignWidth="1450"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <cvert:ColorToBrushConverter x:Key="colorConverter" />
+        <cvert:MatToImageSourceConverter x:Key="matToImageSource" />
+        <Style x:Key="LabelText" TargetType="TextBlock">
+            <Setter Property="Margin" Value="20,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+        <Style x:Key="CoordinateDisplayStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="5" />
+        </Style>
+
+        <Style x:Key="SelectedCoordinateStyle" TargetType="Border">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding SelectedCoordinate.IsSelected}" Value="True">
+                    <Setter Property="Background" Value="LightGreen" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="Transparent">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="0.6*" />
+        </Grid.ColumnDefinitions>
+        <Border
+            Grid.Row="0"
+            Grid.Column="0"
+            BorderThickness="0,0,2,0"
+            BorderBrush="#11aabd" />
+        <!--#region 第一列-->
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <StackPanel Margin="20,10" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="输入图像:" />
+                <TextBox
+                    Width="600"
+                    Margin="0,2,0,2"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SrcImgPath, Mode=TwoWay}"
+                    IsReadOnly="True"
+                    Background="Transparent"
+                    FontSize="18"
+                    Foreground="White"
+                    TextAlignment="Center" />
+                <Button
+                    Width="100"
+                    Height="30"
+                    Margin="30,0,0,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="选择图像"
+                    Command="{Binding SelectSrcImgCommand}" />
+            </StackPanel>
+            <Image
+                Name="TargetImage"
+                Grid.Row="1"
+                Width="760"
+                Height="720"
+                Source="{Binding LastMat, Converter={StaticResource matToImageSource}, Mode=TwoWay}"
+                Stretch="Fill">
+                <!-- 鼠标事件处理 -->
+                <Image.Style>
+                    <Style TargetType="Image">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsCoordinateModeEnabled}" Value="True">
+                                <Setter Property="Cursor" Value="Cross" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Image.Style>
+            </Image>
+            <StackPanel Margin="20,10,20,0" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="保存图像:" />
+                <TextBox
+                    Width="600"
+                    Margin="0,2,0,2"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SaveImagePath, Mode=TwoWay}"
+                    IsReadOnly="True"
+                    Background="Transparent"
+                    FontSize="18"
+                    Foreground="White"
+                    TextAlignment="Center" />
+                <Button
+                    Width="100"
+                    Height="30"
+                    Margin="30,0,0,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="保存图像"
+                    Command="{Binding SaveImageCommand}" />
+            </StackPanel>
+        </StackPanel>
+        <!--#endregion-->
+        <!--#region 第二列-->
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="水漫颜色:" />
+                <Border
+                    Width="80"
+                    Height="30"
+                    Margin="0,0"
+                    VerticalAlignment="Center"
+                    BorderThickness="1"
+                    BorderBrush="Black"
+                    Background="{Binding FloodFillColor, Converter={StaticResource colorConverter}, Mode=TwoWay}">
+                    <!--#region 行为-->
+                    <!-- 上下实现效果一样 -->
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:InvokeCommandAction Command="{Binding FloodFillColorCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <!--#endregion-->
+                </Border>
+            </StackPanel>
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="负差最大值:" />
+                <Slider
+                    Width="100"
+                    Margin="10,2,0,0"
+                    Minimum="0"
+                    Maximum="80"
+                    Value="{Binding DownDiff, Mode=TwoWay}" />
+                <TextBlock Style="{StaticResource LabelText}" Text="{Binding DownDiff}" />
+            </StackPanel>
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="正差最大值:" />
+                <Slider
+                    Width="100"
+                    Margin="10,2,0,0"
+                    Minimum="0"
+                    Maximum="80"
+                    Value="{Binding UpDiff, Mode=TwoWay}" />
+                <TextBlock Style="{StaticResource LabelText}" Text="{Binding UpDiff}" />
+            </StackPanel>
+            <StackPanel Margin="20" Orientation="Vertical">
+                <CheckBox
+                    Width="120"
+                    Height="35"
+                    Margin="10,0,0,0"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource CustomCheckBoxStyle}"
+                    Content="坐标选择模式"
+                    IsChecked="{Binding IsCoordinateModeEnabled, Mode=TwoWay}" />
+                <TextBlock
+                    HorizontalAlignment="Left"
+                    FontSize="16"
+                    Style="{StaticResource LabelText}"
+                    Text="{Binding StatusMessage}" />
+            </StackPanel>
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="当前坐标:" />
+                <TextBlock Text="{Binding CurrentCoordinate.X, StringFormat='X: {0:F1}'}" Style="{StaticResource CoordinateDisplayStyle}" />
+                <TextBlock Text="{Binding CurrentCoordinate.Y, StringFormat='Y: {0:F1}'}" Style="{StaticResource CoordinateDisplayStyle}" />
+            </StackPanel>
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="选中坐标:" />
+                <TextBlock Text="{Binding SelectedCoordinate.X, StringFormat='X: {0:F1}'}" Style="{StaticResource CoordinateDisplayStyle}" />
+                <TextBlock Text="{Binding SelectedCoordinate.Y, StringFormat='Y: {0:F1}'}" Style="{StaticResource CoordinateDisplayStyle}" />
+            </StackPanel>
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <Button
+                    Width="100"
+                    Height="35"
+                    Margin="20,10"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Command="{Binding FloodFillCommand}"
+                    Content="水漫" />
+                <Button
+                    Width="100"
+                    Height="35"
+                    Margin="30,10"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Command="{Binding RevocationCommand}"
+                    Content="撤销" />
+                <Button
+                    Width="100"
+                    Height="35"
+                    Margin="30,10"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Command="{Binding RecoverCommand}"
+                    Content="复原" />
+            </StackPanel>
+        </StackPanel>
+        <!--#endregion-->
+    </Grid>
+</UserControl>

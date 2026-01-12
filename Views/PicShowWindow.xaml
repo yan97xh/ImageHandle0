@@ -1,0 +1,31 @@
+﻿<Window
+    x:Class="ImageHandle.Views.PicShowWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:ImageHandle.Views"
+    Title="PicShowWindow"
+    Width="400"
+    Height="400"
+    MinWidth="100"
+    MinHeight="100"
+    MaxWidth="1000"
+    MaxHeight="1000"
+    WindowStartupLocation="CenterScreen"
+    ResizeMode="CanResizeWithGrip"
+    Deactivated="Window_Deactivated"
+    mc:Ignorable="d">
+    <!--#region 隐藏标题栏-->
+    <WindowChrome.WindowChrome>
+        <WindowChrome GlassFrameThickness="0" />
+    </WindowChrome.WindowChrome>
+    <!--#endregion-->
+    <Grid>
+        <Image
+            x:Name="mainImage"
+            Stretch="Fill"
+            MouseLeftButtonDown="mainImage_MouseLeftButtonDown"
+            MouseWheel="mainImage_MouseWheel" />
+    </Grid>
+</Window>

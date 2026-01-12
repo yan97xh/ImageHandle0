@@ -1,0 +1,392 @@
+﻿<UserControl
+    x:Class="ImageHandle.UserControls.ImgCalUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ImageHandle.UserControls"
+    xmlns:vm="clr-namespace:ImageHandle.ViewModels"
+    xmlns:cvert="clr-namespace:ImageHandle.Converters"
+    Width="1450"
+    Height="840"
+    d:DesignHeight="840"
+    d:DesignWidth="1450"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <cvert:DoubleToPercentConverter x:Key="percentConverter" />
+        <cvert:EmptyStringToNullConverter x:Key="emptyStringToNullConverter" />
+    </UserControl.Resources>
+    <UserControl.DataContext>
+        <vm:ImgCalViewModel />
+    </UserControl.DataContext>
+    <Grid Background="Transparent">
+        <!--#region 行列定义-->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="414" />
+            <RowDefinition Height="426" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="400" />
+            <ColumnDefinition Width="400" />
+        </Grid.ColumnDefinitions>
+        <!--#endregion-->
+        <!--#region 第一列-->
+        <StackPanel
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Orientation="Vertical">
+            <StackPanel Margin="0,8,0,0" Orientation="Horizontal">
+                <CheckBox
+                    Margin="80,5,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource CustomCheckBoxStyle}"
+                    Content="图像大小强制转换"
+                    FontSize="20"
+                    Foreground="White"
+                    IsChecked="{Binding SetSameSizeType}" />
+                <TextBlock
+                    Margin="80,5,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="转换后大小"
+                    FontSize="20"
+                    Foreground="White" />
+                <ComboBox
+                    Width="100"
+                    Height="25"
+                    Margin="20,6,10,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsEditable="False"
+                    ItemsSource="{Binding ImageArr}"
+                    SelectedIndex="0"
+                    Style="{StaticResource ParameterizedComboBoxStyle}"
+                    Background="#495660"
+                    BorderBrush="White"
+                    Foreground="White"
+                    Text="{Binding DstImageSizeType, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+            <Border Height="8" BorderThickness="0,0,0,2" BorderBrush="#11aabd" />
+            <!--#region 两张图运算-->
+            <ItemsControl Margin="20,10,0,0" ItemsSource="{Binding OperationsTwoMat}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Button
+                                Width="120"
+                                Style="{StaticResource ImgOperateBtnStyle}"
+                                Content="{Binding DisplayName}"
+                                Command="{Binding DataContext.TwoMatOpCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding operationEnum}"
+                                ToolTip="{Binding Remark}" />
+                            <ItemsControl ItemsSource="{Binding ParamList}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                                            <TextBlock
+                                                Width="70"
+                                                Margin="7,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Text="{Binding ParamDisplayName}"
+                                                FontSize="16"
+                                                Foreground="White"
+                                                TextAlignment="Center" />
+                                            <TextBox
+                                                Width="50"
+                                                Margin="2,0,7,0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                TextAlignment="Center"
+                                                Text="{Binding ParamValue}"
+                                                ToolTip="{Binding Remark}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="Control.Margin" Value="0,0,20,0" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+            </ItemsControl>
+            <!--#endregion-->
+            <!--#region 第一张图运算-->
+            <ItemsControl Margin="20,10,0,0" ItemsSource="{Binding OperationsOneMat1}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Button
+                                Width="120"
+                                Style="{StaticResource ImgOperateBtnStyle}"
+                                Content="{Binding DisplayName}"
+                                Command="{Binding DataContext.OneMatOpCommand1, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding operationEnum}"
+                                ToolTip="{Binding Remark}" />
+                            <ItemsControl ItemsSource="{Binding ParamList}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                                            <TextBlock
+                                                Width="70"
+                                                Margin="7,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Text="{Binding ParamDisplayName}"
+                                                FontSize="16"
+                                                Foreground="White"
+                                                TextAlignment="Center" />
+                                            <TextBox
+                                                Width="50"
+                                                Margin="2,0,7,0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                TextAlignment="Center"
+                                                Text="{Binding ParamValue}"
+                                                ToolTip="{Binding ParamName}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="Control.Margin" Value="0,0,20,0" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+            </ItemsControl>
+            <!--#endregion-->
+            <!--#region 第二张图运算-->
+            <ItemsControl Margin="20,10,0,0" ItemsSource="{Binding OperationsOneMat2}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Button
+                                Width="120"
+                                Style="{StaticResource ImgOperateBtnStyle}"
+                                Content="{Binding DisplayName}"
+                                Command="{Binding DataContext.OneMatOpCommand2, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                CommandParameter="{Binding operationEnum}"
+                                ToolTip="{Binding Remark}" />
+                            <ItemsControl ItemsSource="{Binding ParamList}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                                            <TextBlock
+                                                Width="70"
+                                                Margin="7,0,0,0"
+                                                VerticalAlignment="Center"
+                                                Text="{Binding ParamDisplayName}"
+                                                FontSize="16"
+                                                Foreground="White"
+                                                TextAlignment="Center" />
+                                            <TextBox
+                                                Width="50"
+                                                Margin="2,0,7,0"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                TextAlignment="Center"
+                                                Text="{Binding ParamValue}"
+                                                ToolTip="{Binding Remark}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="Control.Margin" Value="0,0,20,0" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+            </ItemsControl>
+            <!--#endregion-->
+            <!--#region 图像相似度比较-->
+            <Border Height="10" BorderThickness="0,0,0,2" BorderBrush="#11aabd" />
+            <StackPanel Margin="0,2,0,0" Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <Label
+                        Margin="20,5,0,0"
+                        Content="相似度/PSNR值"
+                        FontSize="20"
+                        Foreground="White" />
+                    <TextBlock
+                        Margin="20,10,0,0"
+                        Text="{Binding Similarity, Converter={StaticResource percentConverter}}"
+                        FontSize="20"
+                        Foreground="White"
+                        TextAlignment="Center" />
+                </StackPanel>
+                <ItemsControl Margin="20,5,0,0" ItemsSource="{Binding SimilarityOperations}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button
+                                    Width="110"
+                                    Margin="0,0,15,5"
+                                    Style="{StaticResource ImgOperateBtnStyle}"
+                                    Content="{Binding DisplayName}"
+                                    Command="{Binding DataContext.SimilarityCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    CommandParameter="{Binding similarityOperation}"
+                                    ToolTip="{Binding Reamrk, Converter={StaticResource emptyStringToNullConverter}}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </StackPanel>
+            <!--#endregion-->
+            <Border Height="8" BorderThickness="0,0,0,2" BorderBrush="#11aabd" />
+            <!--#region 图像拼接-->
+            <ScrollViewer
+                Grid.Row="1"
+                MaxHeight="600"
+                Margin="0,5,0,0"
+                VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding TwoMatOneEnumOps}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="#11aabd" BorderThickness="0,0,0,2">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        Width="80"
+                                        Margin="20,0,10,0"
+                                        VerticalAlignment="Center"
+                                        FontSize="18"
+                                        Foreground="White"
+                                        TextAlignment="Center"
+                                        Text="{Binding LabelText}" />
+                                    <ComboBox
+                                        Grid.Column="1"
+                                        Width="140"
+                                        Height="25"
+                                        Margin="0,0,10,0"
+                                        Padding="5,2"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        IsEditable="False"
+                                        ItemsSource="{Binding ItemsArray}"
+                                        SelectedIndex="0"
+                                        Style="{StaticResource ParameterizedComboBoxStyle}"
+                                        Background="#495660"
+                                        BorderBrush="White"
+                                        Foreground="White"
+                                        ToolTip="{Binding ParamToolText, Converter={StaticResource emptyStringToNullConverter}}"
+                                        Text="{Binding InputParam, UpdateSourceTrigger=PropertyChanged}" />
+                                    <Button
+                                        Grid.Column="2"
+                                        Width="100"
+                                        Height="30"
+                                        Margin="5,5,10,5"
+                                        VerticalAlignment="Center"
+                                        FontSize="16"
+                                        Style="{StaticResource ImgOperateBtnStyle}"
+                                        Content="{Binding ButtonText}"
+                                        Command="{Binding DataContext.TwoMatOneEnumCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        CommandParameter="{Binding OperationType}" />
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            <!--#endregion-->
+        </StackPanel>
+        <Border
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Height="840"
+            BorderThickness="0,0,1,0"
+            BorderBrush="#11aabd" />
+        <!--#endregion-->
+
+        <!--#region 第二列和第三列-->
+        <local:SrcImgShowUserControl
+            x:Name="srcImgControl1"
+            Grid.Row="0"
+            Grid.Column="1"
+            Margin="0"
+            VerticalAlignment="Top"
+            LabelText="输入图像1"
+            SrcImageSource="{Binding SrcImagePath1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Border
+            Grid.Row="0"
+            Grid.Column="1"
+            Height="414"
+            BorderThickness="0,0,1,0"
+            BorderBrush="#11aabd" />
+        <local:SrcImgShowUserControl
+            x:Name="srcImgControl2"
+            Grid.Row="0"
+            Grid.Column="2"
+            Margin="0"
+            VerticalAlignment="Top"
+            LabelText="输入图像2"
+            SrcImageSource="{Binding SrcImagePath2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Border
+            Grid.Row="0"
+            Grid.Column="1"
+            Grid.ColumnSpan="2"
+            Height="414"
+            BorderThickness="0,0,0,1"
+            BorderBrush="#11aabd" />
+        <local:DstImgShowUserControl
+            x:Name="dstImgUserControl"
+            Grid.Row="1"
+            Grid.Column="1"
+            Grid.ColumnSpan="2"
+            Margin="0,0,0,5"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Top"
+            DstImageSource="{Binding DstMat, Mode=TwoWay}" />
+        <!--#endregion-->
+    </Grid>
+</UserControl>

@@ -1,0 +1,172 @@
+﻿<UserControl
+    x:Class="ImageHandle.UserControls.PolygonROIDetectUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ImageHandle.UserControls"
+    xmlns:vm="clr-namespace:ImageHandle.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:cvert="clr-namespace:ImageHandle.Converters"
+    xmlns:roi="clr-namespace:ImageHandle.ROI"
+    Width="1450"
+    Height="840"
+    d:DesignHeight="840"
+    d:DesignWidth="1450"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <cvert:ColorToBrushConverter x:Key="colorConverter" />
+        <cvert:MatToImageSourceConverter x:Key="matToImageSource" />
+        <cvert:BoolToVisibility x:Key="boolToVisibility" />
+        <Style x:Key="LabelText" TargetType="TextBlock">
+            <Setter Property="Margin" Value="20,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+    </UserControl.Resources>
+    <Grid Background="Transparent">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="0.6*" />
+        </Grid.ColumnDefinitions>
+        <Border
+            Grid.Row="0"
+            Grid.Column="0"
+            BorderThickness="0,0,2,0"
+            BorderBrush="#11aabd" />
+        <!--#region 第一列-->
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <StackPanel Margin="20,10" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="输入图像:" />
+                <TextBox
+                    Width="600"
+                    Margin="0,2,0,2"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SrcImgPath, Mode=TwoWay}"
+                    IsReadOnly="True"
+                    Background="Transparent"
+                    FontSize="18"
+                    Foreground="White"
+                    TextAlignment="Center" />
+                <Button
+                    Width="100"
+                    Height="30"
+                    Margin="30,0,0,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="选择图像"
+                    Command="{Binding SelectSrcImgCommand}" />
+            </StackPanel>
+            <Grid Width="800" Height="730">
+                <Image
+                    Name="TargetImage"
+                    Width="760"
+                    Height="720"
+                    Source="{Binding LastMat, Converter={StaticResource matToImageSource}, Mode=TwoWay}"
+                    Stretch="Fill">
+                    <!--<i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDown">
+                            <i:InvokeCommandAction Command="{Binding MouseDownCommand}" />
+                        </i:EventTrigger>
+                        <i:EventTrigger EventName="MouseUp">
+                            <i:InvokeCommandAction Command="{Binding MouseUpCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>-->
+                    <!-- 鼠标事件处理 -->
+                    <!--
+     <Image.Style>
+         <Style TargetType="Image">
+             <Style.Triggers>
+                 <DataTrigger Binding="{Binding IsCoordinateModeEnabled}" Value="True">
+                     <Setter Property="Cursor" Value="Cross" />
+                 </DataTrigger>
+             </Style.Triggers>
+         </Style>
+     </Image.Style>-->
+                </Image>
+                <roi:PolygonROICanvas
+                    Width="760"
+                    Height="720"
+                    Background="Transparent"
+                    EnableDraw="{Binding IsROIDetectEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    PointCollection="{Binding PointList, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                    PolygonROIBrush="{Binding ROIColor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+            </Grid>
+        </StackPanel>
+        <!--#endregion-->
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="ROI边框颜色:" />
+                <Border
+                    Width="80"
+                    Height="30"
+                    Margin="0,0"
+                    VerticalAlignment="Center"
+                    BorderThickness="1"
+                    BorderBrush="Black"
+                    Background="{Binding ROIColor, Mode=TwoWay}">
+                    <!--#region 行为-->
+                    <!-- 上下实现效果一样 -->
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:InvokeCommandAction Command="{Binding ROIColorCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <!--#endregion-->
+                </Border>
+                <Button
+                    Width="100"
+                    Height="40"
+                    Margin="30,0,0,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="初始化ROI"
+                    Command="{Binding InitROICommand}">
+                    <Button.CommandParameter>
+                        <Point X="380" Y="360" />
+                    </Button.CommandParameter>
+                </Button>
+                <Button
+                    Width="100"
+                    Height="40"
+                    Margin="30,0,0,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="清空ROI"
+                    Command="{Binding ClearROICommand}">
+                </Button>
+            </StackPanel>
+            <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="ROI允许绘制:" />
+                <TextBlock Margin="20,0" Style="{StaticResource LabelText}" Text="{Binding IsROIDetectEnabled}" />
+            </StackPanel>
+            <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
+            <StackPanel Orientation="Horizontal">
+                <Button
+                    Margin="50,20"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="ROI抠图"
+                    Command="{Binding ROIDetectCommand}" />
+                <TextBlock Margin="20,0" Style="{StaticResource LabelText}" Text="抠图背景颜色:" />
+                <Border
+                    Width="80"
+                    Height="30"
+                    Margin="0,0"
+                    VerticalAlignment="Center"
+                    BorderThickness="1"
+                    BorderBrush="Black"
+                    Background="{Binding DetectBackColor, Mode=TwoWay}">
+                    <!--#region 行为-->
+                    <!-- 上下实现效果一样 -->
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseLeftButtonDown">
+                            <i:InvokeCommandAction Command="{Binding DetectBackColorCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <!--#endregion-->
+                </Border>
+            </StackPanel>
+            <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
+            <local:DstImgShowUserControl Margin="0,20" LabelText="保存图像" DstImageSource="{Binding ROIDetectMat, Mode=TwoWay}" />
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,189 @@
+﻿<UserControl
+    x:Class="ImageHandle.UserControls.TemplateMatchUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ImageHandle.UserControls"
+    xmlns:vm="clr-namespace:ImageHandle.ViewModels"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:cvert="clr-namespace:ImageHandle.Converters"
+    xmlns:roi="clr-namespace:ImageHandle.ROI"
+    xmlns:rule="clr-namespace:ImageHandle.ValidationRules"
+    Width="1450"
+    Height="840"
+    d:DesignHeight="840"
+    d:DesignWidth="1450"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <cvert:ColorToBrushConverter x:Key="colorConverter" />
+        <cvert:MatToImageSourceConverter x:Key="matToImageSource" />
+        <cvert:BoolToVisibility x:Key="boolToVisibility" />
+        <Style x:Key="LabelText" TargetType="TextBlock">
+            <Setter Property="Margin" Value="20,0" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="20" />
+        </Style>
+    </UserControl.Resources>
+    <UserControl.DataContext>
+        <vm:TemplateMatchViewModel />
+    </UserControl.DataContext>
+    <Grid Background="Transparent">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="0.6*" />
+        </Grid.ColumnDefinitions>
+        <Border
+            Grid.Row="0"
+            Grid.Column="0"
+            BorderThickness="0,0,2,0"
+            BorderBrush="#11aabd" />
+        <!--#region 第一列-->
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <StackPanel Margin="20,10" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="输入图像:" />
+                <TextBox
+                    Width="600"
+                    Margin="0,2,0,2"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SrcImagePath, Mode=TwoWay}"
+                    IsReadOnly="True"
+                    Background="Transparent"
+                    FontSize="18"
+                    Foreground="White"
+                    TextAlignment="Center" />
+                <Button
+                    Width="100"
+                    Height="30"
+                    Margin="30,0,0,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="选择图像"
+                    Command="{Binding SelectSrcImgCommand}" />
+            </StackPanel>
+            <Grid Width="800" Height="710">
+                <Image
+                    Name="TargetImage"
+                    Width="730"
+                    Height="700"
+                    Source="{Binding DstMat, Converter={StaticResource matToImageSource}, Mode=TwoWay}"
+                    Stretch="Fill">
+                </Image>
+            </Grid>
+            <StackPanel Margin="20,20" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}" Text="保存图像:" />
+                <TextBox
+                    Width="600"
+                    Margin="0,2,0,2"
+                    HorizontalAlignment="Center"
+                    Text="{Binding SaveImagePath, Mode=TwoWay}"
+                    IsReadOnly="True"
+                    Background="Transparent"
+                    FontSize="18"
+                    Foreground="White"
+                    TextAlignment="Center" />
+                <Button
+                    Width="100"
+                    Height="30"
+                    Margin="30,0,0,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="保存图像"
+                    Command="{Binding SaveImageCommand}" />
+            </StackPanel>
+        </StackPanel>
+        <!--#endregion-->
+        <!--#region 第二列-->
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            <StackPanel Height="300" Margin="20,10" Orientation="Horizontal">
+                <TextBlock Style="{StaticResource LabelText}">
+                    <Run>模</Run>
+                    <LineBreak />
+                    <Run>板</Run>
+                    <LineBreak />
+                    <Run>图</Run>
+                    <LineBreak />
+                    <Run>像</Run>
+                </TextBlock>
+                <Border
+                    Width="244"
+                    Height="244"
+                    BorderThickness="2"
+                    BorderBrush="#11aabd">
+                    <Image Margin="1" Source="{Binding TemplateMat, Converter={StaticResource matToImageSource}, Mode=TwoWay}" Stretch="Fill" />
+                </Border>
+                <Button
+                    Width="100"
+                    Height="30"
+                    Margin="30,0,0,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="选择模板"
+                    Command="{Binding SelectTemplateImgCommand}" />
+            </StackPanel>
+            <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <TextBlock Margin="20,0,40,0" Style="{StaticResource LabelText}" Text="匹配方法:" />
+                <ComboBox
+                    Width="150"
+                    Height="30"
+                    Margin="60,0,0,0"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    IsEditable="False"
+                    ItemsSource="{Binding TemplateMatchModeArray}"
+                    SelectedIndex="0"
+                    Style="{StaticResource ParameterizedComboBoxStyle}"
+                    Background="#495660"
+                    BorderBrush="White"
+                    Foreground="White"
+                    FontSize="16"
+                    Text="{Binding TemplateMatchMode, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+            <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
+            <StackPanel Margin="20" Orientation="Horizontal">
+                <TextBlock Margin="20,0,20,0" Style="{StaticResource LabelText}" Text="多模版匹配阈值:" />
+                <TextBox
+                    Width="100"
+                    Margin="20,0,0,0"
+                    VerticalContentAlignment="Center"
+                    TextAlignment="Center"
+                    FontSize="20"
+                    Background="#495660"
+                    Foreground="White"
+                    ToolTip="0-1">
+                    <TextBox.Text>
+                        <Binding Path="MultiMatchThreshold">
+                            <Binding.ValidationRules>
+                                <rule:RangeDoubleValidationRule MinValue="0" MaxValue="1" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </StackPanel>
+            <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
+            <StackPanel Margin="10,20" Orientation="Horizontal">
+                <Button
+                    Width="150"
+                    Height="40"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="单模版匹配"
+                    Command="{Binding TemplateMatchSingle}" />
+                <Button
+                    Width="150"
+                    Height="40"
+                    Margin="20,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="多模版匹配"
+                    Command="{Binding TemplateMatchMultiCommand}" />
+                <Button
+                    Width="150"
+                    Height="40"
+                    Margin="20,0"
+                    Style="{StaticResource ImgOperateBtnStyle}"
+                    Content="角度模版匹配"
+                    Command="{Binding TemplateMatchCircleCommand}" />
+            </StackPanel>
+            <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
+        </StackPanel>
+        <!--#endregion-->
+    </Grid>
+</UserControl>

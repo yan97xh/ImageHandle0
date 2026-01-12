@@ -1,0 +1,77 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+	 <!-- 添加以下配置 -->
+	 <PublishSingleFile>true</PublishSingleFile>
+ <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+ <EnableUnsafeBinaryFormatterSerialization>true</EnableUnsafeBinaryFormatterSerialization>
+ <ApplicationIcon>bin\Debug\net8.0-windows\Resource\1.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Services\ImgSingalOperateService.cs" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Drawing.Common" Version="8.0.11" />
+	</ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Resource\DNN\Caffe\deploy.prototxt" />
+    <None Remove="Resource\DNN\Caffe\res10_300x300_ssd_iter_140000_fp16.caffemodel" />
+    <None Remove="Resource\DNN\TensorFlow\frozen_inference_graph.pb" />
+    <None Remove="Resource\DNN\TensorFlow\mscoco_label_map.pbtxt" />
+    <None Remove="Resource\Fonts\iconfont.ttf" />
+    <None Remove="Resource\iconfont.ttf" />
+    <None Remove="Resource\Images\0.png" />
+    <None Remove="Resource\Images\HSVRange.png" />
+    <None Remove="Resource\Images\image_512px.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\net8.0-windows\Resource\1.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="OpenCvSharp4" Version="4.11.0.20250507" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.11.0.20250507" />
+    <PackageReference Include="OpenCvSharp4.WpfExtensions" Version="4.11.0.20250507" />
+    <PackageReference Include="QRCoder" Version="1.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resource\xml\80611_haarcascades\__MACOSX\haarcascades\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Windows.Forms">
+      <HintPath>Resource\DLLS\System.Windows.Forms.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resource\DNN\Caffe\deploy.prototxt" />
+    <Resource Include="Resource\DNN\Caffe\res10_300x300_ssd_iter_140000_fp16.caffemodel" />
+    <Resource Include="Resource\DNN\TensorFlow\frozen_inference_graph.pb" />
+    <Resource Include="Resource\DNN\TensorFlow\mscoco_label_map.pbtxt" />
+    <Resource Include="Resource\Fonts\iconfont.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resource\Images\0.png" />
+    <Resource Include="Resource\Images\HSVRange.png" />
+    <Resource Include="Resource\Images\image_512px.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="UserControls\PolygonROIDetectUserControl.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+</Project>

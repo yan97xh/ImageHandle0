@@ -1,0 +1,106 @@
+﻿<UserControl
+    x:Class="ImageHandle.Scripts.ScriptMainUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:ImageHandle.Scripts"
+    xmlns:us="clr-namespace:ImageHandle.UserControls"
+    Width="1450"
+    Height="820"
+    d:DesignHeight="820"
+    d:DesignWidth="1450"
+    mc:Ignorable="d">
+    <Grid Background="Transparent">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="0.5*" />
+            <ColumnDefinition Width="400" />
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <ListBox
+            x:Name="MethodsListBox"
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="0"
+            Margin="10"
+            Background="LightCyan"
+            AllowDrop="True"
+            ItemsSource="{Binding MethodNames, Mode=TwoWay}"
+            PreviewMouseLeftButtonDown="MethodsListBox_PreviewMouseLeftButtonDown">
+        </ListBox>
+        <Canvas
+            x:Name="ScriptCanvas"
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="1"
+            Margin="10"
+            Background="WhiteSmoke"
+            AllowDrop="True"
+            Drop="ScriptCanvas_Drop"
+            MouseRightButtonDown="ScriptCanvas_MouseRightButtonDown" />
+        <StackPanel
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="2"
+            Orientation="Vertical">
+            <CheckBox
+                Margin="70,10"
+                Style="{StaticResource CustomCheckBoxStyle}"
+                Content="中文显示"
+                FontSize="20"
+                IsChecked="{Binding IsCN, Mode=TwoWay}"
+                Checked="CheckBox_Checked"
+                Unchecked="CheckBox_Checked" />
+            <Button
+                Width="100"
+                Height="30"
+                Margin="20,100"
+                Content="执行脚本"
+                Style="{StaticResource ImgOperateBtnStyle}"
+                Click="ExcuteButton_Click" />
+            <Button
+                Width="100"
+                Height="30"
+                Margin="20"
+                Content="清空脚本"
+                Style="{StaticResource ImgOperateBtnStyle}"
+                Click="ClearScriptButton_Click" />
+            <Button
+                Width="100"
+                Height="30"
+                Margin="20"
+                Content="整理"
+                Style="{StaticResource ImgOperateBtnStyle}"
+                Click="CleanControlButton_Click" />
+        </StackPanel>
+        <Border
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="2"
+            Height="820"
+            BorderThickness="0,0,2,0"
+            BorderBrush="#11aabd" />
+        <us:SrcImgShowUserControl
+            Grid.Row="0"
+            Grid.Column="3"
+            Margin="0"
+            SrcImageSource="{Binding SrcImagePath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Border
+            Grid.Row="0"
+            Grid.Column="3"
+            Height="410"
+            BorderThickness="0,0,0,2"
+            BorderBrush="#11aabd" />
+        <us:DstImgShowUserControl
+            Grid.Row="1"
+            Grid.Column="3"
+            Margin="0"
+            DstImageSource="{Binding DstMat, Mode=TwoWay}" />
+    </Grid>
+</UserControl>
