@@ -48,9 +48,9 @@
             </ItemsControl>
             <!--#endregion-->
 
-            <StackPanel Margin="10,5,0,0" Orientation="Horizontal">
+            <StackPanel Margin="10,5,0,5" Orientation="Horizontal">
                 <!--#region 一个参数 int 或 double-->
-                <ScrollViewer Grid.Row="1" MaxHeight="540" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="1" MaxHeight="500" VerticalScrollBarVisibility="Auto">
                     <ItemsControl ItemsSource="{Binding OperationsOneParamNum}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -78,8 +78,7 @@
                                             VerticalAlignment="Center"
                                             TextAlignment="Center"
                                             ToolTip="{Binding ParamToolText, Converter={StaticResource emptyStringToNullConverter}}"
-                                            Text="{Binding InputParam, UpdateSourceTrigger=PropertyChanged}" />
-
+                                            Text="{Binding InputParam, UpdateSourceTrigger=PropertyChanged}" /> 
                                         <Button
                                             Grid.Column="2"
                                             Width="120"

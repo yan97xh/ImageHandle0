@@ -7,7 +7,7 @@
     {
         public MainViewModel()
         {
-            NavigationViewModel = new NavigationViewModel();
+             NavigationViewModel = new NavigationViewModel(); 
         }
 
         // 多界面切换的VM

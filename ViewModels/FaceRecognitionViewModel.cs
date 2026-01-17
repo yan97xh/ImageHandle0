@@ -409,8 +409,8 @@ namespace ImageHandle.ViewModels
             {
                 MessageBox.Show("本地训练集小于两组,请添加训练集");
                 return false;
-            }
-            if (DirectoryHasTwoGroup(_trainInfoPath) == false)
+            } 
+            if (HasAtLeastTwoDirectoriesWithFiles(_trainInfoPath) == false)
             {
                 MessageBox.Show("本地训练集小于两组,请添加训练集");
                 return false;
@@ -458,36 +458,24 @@ namespace ImageHandle.ViewModels
                 MessageBox.Show("训练失败: " + ex.Message);
             }
         }
-
-        private bool DirectoryHasTwoGroup(string path, string type = ".jpg")
+ 
+        private bool HasAtLeastTwoDirectoriesWithFiles(string directoryPath, string fileExtension = ".jpg")
         {
-            if (Directory.Exists(path) == false)
+            if (string.IsNullOrWhiteSpace(directoryPath) || !Directory.Exists(directoryPath))
                 return false;
-            DirectoryInfo _path = new DirectoryInfo(path);
-            if (_path.GetDirectories().Length == 0)
+
+            try
+            {
+                var directoryInfo = new DirectoryInfo(directoryPath);
+        
+                return directoryInfo.EnumerateDirectories()
+                                    .Count(subDir => subDir.EnumerateFiles()
+                                                           .Any(file => file.Extension.Equals(fileExtension, StringComparison.OrdinalIgnoreCase))) >= 2;
+            }
+            catch (Exception ex) when (ex is UnauthorizedAccessException || ex is PathTooLongException || ex is DirectoryNotFoundException)
             {
                 return false;
             }
-
-            int i = 0;
-
-            foreach (DirectoryInfo var in _path.GetDirectories())
-            {
-                DirectoryInfo path1 = new DirectoryInfo(var.FullName);
-                foreach (FileInfo ff in path1.GetFiles())
-                {
-                    if (ff.FullName.Contains(type))
-                    {
-                        i++;
-                        break;
-                    }
-                }
-                if (i >= 2)
-                {
-                    return true;
-                }
-            }
-            return false;
         }
 
         // 从图片中获取所有的人脸图片

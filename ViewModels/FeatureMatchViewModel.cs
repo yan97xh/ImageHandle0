@@ -66,7 +66,7 @@ namespace ImageHandle.ViewModels
 
         public double MatchDisParam
         {
-            get { return _matchDisParam; }
+            get => _matchDisParam;
             set
             {
                 if (value <= 0)
@@ -77,6 +77,7 @@ namespace ImageHandle.ViewModels
                 {
                     _matchDisParam = value;
                 }
+
                 OnPropertyChanged();
             }
         }
@@ -97,10 +98,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        public string[] MatcherModeArr
-        {
-            get;
-        }
+        public string[] MatcherModeArr { get; }
 
         #endregion 匹配器类型
 
@@ -113,21 +111,25 @@ namespace ImageHandle.ViewModels
                 MessageBox.Show("未选择输入图像1");
                 return;
             }
+
             if (string.IsNullOrEmpty(_srcImagePath2))
             {
                 MessageBox.Show("未选择输入图像2");
                 return;
             }
+
             if (File.Exists(_srcImagePath1) == false)
             {
                 MessageBox.Show($"图像:{_srcImagePath1}不存在");
                 return;
             }
+
             if (File.Exists(_srcImagePath2) == false)
             {
                 MessageBox.Show($"图像:{_srcImagePath1}不存在");
                 return;
             }
+
             Mat srcImg1 = new Mat(_srcImagePath1);
             Mat srcImg2 = new Mat(_srcImagePath2);
 
@@ -136,20 +138,21 @@ namespace ImageHandle.ViewModels
                 MessageBox.Show($"匹配器选择有误");
                 return;
             }
+
             MatcherMode _matcher = (MatcherMode)result;
 
             switch (operation)
             {
                 case FeatureMatchMode.SIFT:
-                    {
-                        FeatureMatchResModel = ImageOperateMethods.SIFTMatch(srcImg1, srcImg2, _matcher, _matchDisParam);
-                    }
+                {
+                    FeatureMatchResModel = ImageOperateMethods.SIFTMatch(srcImg1, srcImg2, _matcher, _matchDisParam);
+                }
                     break;
 
                 case FeatureMatchMode.SURF:
-                    {
-                        FeatureMatchResModel = ImageOperateMethods.SURFMatch(srcImg1, srcImg2, _matcher, _matchDisParam);
-                    }
+                {
+                    FeatureMatchResModel = ImageOperateMethods.SURFMatch(srcImg1, srcImg2, _matcher, _matchDisParam);
+                }
                     break;
             }
         }

@@ -56,45 +56,18 @@ namespace ImageHandle.Models
             Mat dstImg = new Mat();
             PointsCount = 0;
             Enum.TryParse(InputParam, out FeatureDetectPointMode mode);
-            KeyPoint[] keyPoints = new KeyPoint[2];
-
-            switch (mode)
-            {
-                case FeatureDetectPointMode.SIFT:
-                    SIFT sift = SIFT.Create(1000);
-                    keyPoints = sift.Detect(srcImg);
-                    break;
-
-                case FeatureDetectPointMode.SURF:
-                    SURF surf = SURF.Create(1000);
-                    keyPoints = surf.Detect(srcImg);
-                    break;
-
-                case FeatureDetectPointMode.Star:
-                    StarDetector star = StarDetector.Create();
-                    keyPoints = star.Detect(srcImg);
-                    break;
-
-                case FeatureDetectPointMode.ORB_FERAK:
-                    ORB orb = ORB.Create(500);
-                    keyPoints = orb.Detect(srcImg);
-                    break;
-
-                case FeatureDetectPointMode.BRISK:
-                    BRISK birsk = BRISK.Create();
-                    keyPoints = birsk.Detect(srcImg);
-                    break;
-
-                case FeatureDetectPointMode.MSER:
-                    MSER mser = MSER.Create();
-                    keyPoints = mser.Detect(srcImg);
-                    break;
-
-                case FeatureDetectPointMode.GFTT:
-                    GFTTDetector gFTTDetector = GFTTDetector.Create(500, 0.01, 15, 3, false, 0.04);
-                    keyPoints = gFTTDetector.Detect(srcImg); // no mask
-                    break;
-            }
+            KeyPoint[] keyPoints = new KeyPoint[2]; 
+            Feature2D feature2D = mode switch
+                                  {
+                                      FeatureDetectPointMode.SIFT => SIFT.Create(1000),
+                                      FeatureDetectPointMode.SURF => SURF.Create(1000),
+                                      FeatureDetectPointMode.Star => StarDetector.Create(),
+                                      FeatureDetectPointMode.ORB_FERAK=> ORB.Create(500),
+                                      FeatureDetectPointMode.BRISK=> BRISK.Create(),
+                                      FeatureDetectPointMode.MSER=> MSER.Create(),
+                                      FeatureDetectPointMode.GFTT=> GFTTDetector.Create(500, 0.01, 15, 3, false, 0.04)
+                                  };
+            keyPoints = feature2D.Detect(srcImg);  
             PointsCount = keyPoints.Count();
             if (PointsCount != 0)
             {
@@ -106,6 +79,7 @@ namespace ImageHandle.Models
                     pp.Y = (int)keyPoints[i].Pt.Y;
                     Cv2.Circle(srcImg, pp, 3, new OpenCvSharp.Scalar(r.Next(0, 255), r.Next(0, 255), r.Next(0, 255)));
                 }
+
                 dstImg = srcImg;
                 return dstImg;
             }

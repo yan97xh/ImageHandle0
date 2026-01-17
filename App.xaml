@@ -14,6 +14,7 @@
                 <ResourceDictionary Source="/Dictionaries/CustomScrollViewerStyleDic.xaml" />
                 <ResourceDictionary Source="/Dictionaries/CustomCheckBoxStyleDic.xaml" />
                 <ResourceDictionary Source="/Dictionaries/CustomContextMenuStyleDic.xaml" />
+                <ResourceDictionary Source="/Dictionaries/CustomListBoxStyleDic.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

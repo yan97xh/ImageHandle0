@@ -5,12 +5,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ImageHandle.Scripts"
-    xmlns:us="clr-namespace:ImageHandle.UserControls"
+    xmlns:us="clr-namespace:ImageHandle.UserControls" 
     Width="1450"
     Height="820"
     d:DesignHeight="820"
     d:DesignWidth="1450"
-    mc:Ignorable="d">
+    mc:Ignorable="d"> 
     <Grid Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200" />
@@ -25,6 +25,7 @@
         </Grid.RowDefinitions>
         <ListBox
             x:Name="MethodsListBox"
+            Style="{StaticResource CustomListBoxStyle}"
             Grid.Row="0"
             Grid.RowSpan="2"
             Grid.Column="0"
@@ -40,7 +41,7 @@
             Grid.RowSpan="2"
             Grid.Column="1"
             Margin="10"
-            Background="WhiteSmoke"
+            Background="LightCyan"
             AllowDrop="True"
             Drop="ScriptCanvas_Drop"
             MouseRightButtonDown="ScriptCanvas_MouseRightButtonDown" />

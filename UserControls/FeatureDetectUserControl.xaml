@@ -126,13 +126,13 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     IsEditable="False"
-                    ItemsSource="{Binding featureDetectPointModel.ItemsArray}"
+                    ItemsSource="{Binding FeatureDetectPointModel.ItemsArray}"
                     SelectedIndex="0"
                     Style="{StaticResource ParameterizedComboBoxStyle}"
                     Background="#495660"
                     BorderBrush="White"
                     Foreground="White"
-                    Text="{Binding featureDetectPointModel.InputParam, UpdateSourceTrigger=PropertyChanged}" />
+                    Text="{Binding FeatureDetectPointModel.InputParam, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBlock
                     Margin="20,0,0,0"
                     VerticalAlignment="Center"
@@ -144,7 +144,7 @@
                     Margin="10,0,0,0"
                     VerticalAlignment="Center"
                     TextAlignment="Center"
-                    Text="{Binding featureDetectPointModel.PointsCount}"
+                    Text="{Binding FeatureDetectPointModel.PointsCount}"
                     FontSize="20"
                     Foreground="White" />
                 <Button

@@ -251,8 +251,7 @@ namespace ImageHandle.Scripts
 
             var tb = new ScriptUserControl()
             {
-                LabelText = text,
-                Background = Brushes.Gray,
+                LabelText = text, 
             };
 
             _controlParamDic[tb] = ScriptService.Instance.Navigate(text, _viewModel.IsCN);
@@ -730,7 +729,7 @@ namespace ImageHandle.Scripts
 
         //执行脚本
         private async void ExcuteButton_Click(object sender, RoutedEventArgs e)
-        {
+        {  
             if (_viewModel.SrcImagePath == null || !File.Exists(_viewModel.SrcImagePath))
             {
                 MessageBox.Show("请先选择源图像。");
