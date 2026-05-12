@@ -47,5 +47,10 @@ namespace ImageHandle.Models
                 OnPropertyChanged();
             }
         }
+
+        public Type EnumType
+        {
+            get; set;
+        }
     }
 }

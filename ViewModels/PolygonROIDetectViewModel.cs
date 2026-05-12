@@ -1,52 +1,30 @@
-﻿using Microsoft.Win32;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using OpenCvSharp;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ImageHandle.ViewModels
 {
-    internal class PolygonROIDetectViewModel : ViewModelBase
+    internal partial class PolygonROIDetectViewModel : ObservableObject
     {
         private readonly double defaultROIWidth = 100;
         private readonly double defaultROIHeight = 100;
 
         public PolygonROIDetectViewModel()
         {
-            InitROICommand = new Commands.Command<System.Windows.Point>(InitROI);
-
             _matCollection = new ObservableCollection<Mat>();
             _matCollection.CollectionChanged += OnCollectionChanged;
-
-            SelectSrcImgCommand = new Commands.RelayCommand(SelectSrcImg);
-            SaveImageCommand = new Commands.RelayCommand(SaveImage);
-
-            ROIColorCommand = new Commands.RelayCommand(ProcessROIColor);
-            ROIDetectCommand = new Commands.RelayCommand(PolygonROIDetect);
-            ClearROICommand = new Commands.RelayCommand(ClearROI);
-
-            DetectBackColorCommand = new Commands.RelayCommand(ProcessDetectBackColor);
         }
 
-        #region ROI
-
+        [ObservableProperty]
         private bool isROIDetectEnabled = false;
 
-        public bool IsROIDetectEnabled
-        {
-            get { return isROIDetectEnabled; }
-            set
-            {
-                isROIDetectEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand InitROICommand { get; }
-
+        [RelayCommand]
         private void InitROI(System.Windows.Point center)
         {
             if (string.IsNullOrEmpty(SrcImgPath))
@@ -62,71 +40,29 @@ namespace ImageHandle.ViewModels
             IsROIDetectEnabled = true;
         }
 
-        public ICommand ClearROICommand { get; }
-
+        [ObservableProperty]
         private ObservableCollection<System.Windows.Point> _pointList = new ObservableCollection<System.Windows.Point>();
 
-        public ObservableCollection<System.Windows.Point> PointList
-        {
-            get => _pointList;
-            set
-            {
-                _pointList = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [RelayCommand]
         private void ClearROI()
         {
             IsROIDetectEnabled = false;
             PointList.Clear();
         }
 
-        #endregion ROI
-
-        #region 输入输出图像路径
-
+        [ObservableProperty]
         private string _srcImgPath;
 
-        public string SrcImgPath
-        {
-            get => _srcImgPath;
-            set
-            {
-                _srcImgPath = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private string _saveImagePath;
-
-        public string SaveImagePath
-        {
-            get => _saveImagePath;
-            set
-            {
-                _saveImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入输出图像路径
 
         #region 图像集合 用于保存每步操作 可撤销
 
         private ObservableCollection<Mat> _matCollection = new ObservableCollection<Mat>();
         public ObservableCollection<Mat> MatCollection => _matCollection;
-        private Mat _lastMat;
 
-        public Mat LastMat
-        {
-            get => _lastMat;
-            set
-            {
-                _lastMat = value;
-                OnPropertyChanged();
-            }
-        }
+        [ObservableProperty]
+        private Mat _lastMat;
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -151,10 +87,7 @@ namespace ImageHandle.ViewModels
 
         #endregion 图像集合 用于保存每步操作 可撤销
 
-        #region 选择输入图像命令
-
-        public ICommand SelectSrcImgCommand { get; }
-
+        [RelayCommand]
         private void SelectSrcImg()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -174,12 +107,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择输入图像命令
-
-        #region 保存输出图像命令
-
-        public ICommand SaveImageCommand { get; }
-
+        [RelayCommand]
         private void SaveImage()
         {
             if (LastMat == null)
@@ -211,24 +139,10 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 保存输出图像命令
-
-        #region 选择颜色的命令
-
+        [ObservableProperty]
         private Brush _rOIColor = Brushes.Red;
 
-        public Brush ROIColor
-        {
-            get { return _rOIColor; }
-            set
-            {
-                _rOIColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand ROIColorCommand { get; }
-
+        [RelayCommand]
         private void ProcessROIColor()
         {
             var colorDialog = new System.Windows.Forms.ColorDialog();
@@ -245,20 +159,10 @@ namespace ImageHandle.ViewModels
             }
         }
 
+        [ObservableProperty]
         private Brush _detectBackColor = Brushes.Black;
 
-        public Brush DetectBackColor
-        {
-            get { return _detectBackColor; }
-            set
-            {
-                _detectBackColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand DetectBackColorCommand { get; }
-
+        [RelayCommand]
         private void ProcessDetectBackColor()
         {
             var colorDialog = new System.Windows.Forms.ColorDialog();
@@ -275,23 +179,8 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择颜色的命令
-
-        #region 抠图
-
+        [ObservableProperty]
         private Mat _rOIDetectMat;
-
-        public Mat ROIDetectMat
-        {
-            get { return _rOIDetectMat; }
-            set
-            {
-                _rOIDetectMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand ROIDetectCommand { get; }
 
         // 显示控件上的图像展示尺寸（由视图层设置：通常是 Image 或 ROICanvas 的实际显示尺寸）
         private double _imageDisplayWidth;
@@ -310,6 +199,7 @@ namespace ImageHandle.ViewModels
             set { _imageDisplayHeight = value; OnPropertyChanged(); }
         }
 
+        [RelayCommand]
         private void PolygonROIDetect()
         {
             if (LastMat == null)
@@ -418,7 +308,5 @@ namespace ImageHandle.ViewModels
 
             return new OpenCvSharp.Point(sumX / points.Count, sumY / points.Count);
         }
-
-        #endregion 抠图
     }
 }

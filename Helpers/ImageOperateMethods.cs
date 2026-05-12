@@ -1,4 +1,6 @@
-﻿using ImageHandle.Models;
+﻿using ImageHandle.Attributes;
+using ImageHandle.Models;
+using ImageHandle.Scripts;
 using OpenCvSharp;
 using OpenCvSharp.Dnn;
 using OpenCvSharp.Features2D;
@@ -22,7 +24,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("彩图转灰图")]
+        [MethodCNName("彩图转灰图"), NoneParam]
         public static Mat CvtColorToGray(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -35,7 +37,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("彩图转HSV")]
+        [MethodCNName("彩图转HSV"), NoneParam]
         public static Mat CvtColorToHSV(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -48,7 +50,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("彩图转Lab")]
+        [MethodCNName("彩图转Lab"), NoneParam]
         public static Mat CvtColorToLab(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -61,7 +63,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg">输入图像</param>
         /// <returns></returns>
-        [MethodCNName("转化彩图")]
+        [MethodCNName("转化彩图"), NoneParam]
         public static Mat CvtColorToRGB(Mat srcImg)
         {
             srcImg.ConvertTo(srcImg, MatType.CV_8UC3);
@@ -76,7 +78,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("直方图均衡化")]
+        [MethodCNName("直方图均衡化"), NoneParam]
         public static Mat EqualizeHist(Mat srcImg)
         {
             Cv2.CvtColor(srcImg, srcImg, ColorConversionCodes.BGR2GRAY);
@@ -90,7 +92,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("大津法二值化")]
+        [MethodCNName("大津法二值化"), NoneParam]
         public static Mat Otsu(Mat srcImg)
         {
             Cv2.CvtColor(srcImg, srcImg, ColorConversionCodes.BGR2GRAY);
@@ -104,7 +106,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("图像取反")]
+        [MethodCNName("图像取反"), NoneParam]
         public static Mat Negation(Mat srcImg)
         {
             Cv2.CvtColor(srcImg, srcImg, ColorConversionCodes.BGR2GRAY);
@@ -128,7 +130,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("怀旧特效")]
+        [MethodCNName("怀旧特效"), NoneParam]
         public static Mat RetroEffect(Mat srcImg)
         {
             srcImg.ConvertTo(srcImg, MatType.CV_8UC3);
@@ -162,7 +164,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("熔铸特效")]
+        [MethodCNName("熔铸特效"), NoneParam]
         public static Mat FusedCastEffect(Mat srcImg)
         {
             srcImg.ConvertTo(srcImg, MatType.CV_8UC3);
@@ -196,7 +198,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("冰冻特效")]
+        [MethodCNName("冰冻特效"), NoneParam]
         public static Mat FrozenEffect(Mat srcImg)
         {
             srcImg.ConvertTo(srcImg, MatType.CV_8UC3);
@@ -230,7 +232,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("连环画特效")]
+        [MethodCNName("连环画特效"), NoneParam]
         public static Mat ComicEffect(Mat srcImg)
         {
             srcImg.ConvertTo(srcImg, MatType.CV_8UC3);
@@ -265,7 +267,7 @@ namespace ImageHandle.Helpers
         /// <param name="srcImg"></param>
         /// <param name="blueValue"></param>
         /// <returns></returns>
-        [MethodCNName("流年特效")]
+        [MethodCNName("流年特效"), NoneParam]
         public static Mat FleetingEffect(Mat srcImg)
         {
             srcImg.ConvertTo(srcImg, MatType.CV_8UC3);
@@ -299,7 +301,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("USM锐化")]
+        [MethodCNName("USM锐化"), NoneParam]
         public static Mat USM(Mat srcImg)
         {
             Mat dstImg = srcImg.Clone();
@@ -316,7 +318,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("自动白平衡")]
+        [MethodCNName("自动白平衡"), NoneParam]
         public static Mat AutoWhithBalance(Mat srcImg)
         {
             Mat dst = new Mat(srcImg.Size(), MatType.CV_8UC3);
@@ -413,7 +415,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("磨皮")]
+        [MethodCNName("磨皮"), NoneParam]
         public static Mat Buffing(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -451,7 +453,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("美白")]
+        [MethodCNName("美白"), NoneParam]
         public static Mat Whitening(Mat srcImg)
         {
             Mat blur_img = new Mat();
@@ -477,7 +479,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <param name="out_img"></param>
-        [MethodCNName("低照度增强")]
+        [MethodCNName("低照度增强"), NoneParam]
         public static Mat LowIlluminationEnhance(Mat srcImg)
         {
             Mat dstImg = srcImg.Clone();
@@ -539,7 +541,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("图像转置")]
+        [MethodCNName("图像转置"), NoneParam]
         public static Mat Transpose(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -552,7 +554,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("图像平滑")]
+        [MethodCNName("图像平滑"), NoneParam]
         public static Mat Smooth(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -568,7 +570,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("小波变换")]
+        [MethodCNName("小波变换"), NoneParam]
         public static Mat WaveletTransform(Mat srcImg)
         {
             int height = srcImg.Cols;
@@ -617,7 +619,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("线性滤波")]
+        [MethodCNName("线性滤波"), NoneParam]
         public static Mat SepFilter2D(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -634,7 +636,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("重映射")]
+        [MethodCNName("重映射"), NoneParam]
         public static Mat Remaping(Mat srcImg)
         {
             Mat xMatImg = new Mat(new OpenCvSharp.Size(srcImg.Cols, srcImg.Rows), MatType.CV_32FC1);
@@ -658,7 +660,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("透视变换")]
+        [MethodCNName("透视变换"), NoneParam]
         public static Mat Perspect(Mat srcImg)
         {
             int hh = 20;
@@ -675,7 +677,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("剪切变换")]
+        [MethodCNName("剪切变换"), NoneParam]
         public static Mat Shear(Mat srcImg)
         {
             int hh = 30;
@@ -691,7 +693,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("直线矫正")]
+        [MethodCNName("直线矫正"), NoneParam]
         public static Mat LineCorrect(Mat srcImg)
         {
             Mat dstImg = srcImg.Clone();
@@ -736,7 +738,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("DCT变换")]
+        [MethodCNName("DCT变换"), NoneParam]
         public static Mat DCT(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -751,7 +753,7 @@ namespace ImageHandle.Helpers
         /// <summary>
         /// 图像轮廓检测
         /// </summary>
-        [MethodCNName("轮廓检测")]
+        [MethodCNName("轮廓检测"), NoneParam]
         public static Mat Contours(Mat srcImg)
         {
             Mat gray = new Mat();
@@ -785,7 +787,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("凸包检测")]
+        [MethodCNName("凸包检测"), NoneParam]
         public static Mat Hull(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -823,7 +825,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("凸包缺陷检测")]
+        [MethodCNName("凸包缺陷检测"), NoneParam]
         public static Mat ConvexityDefects(Mat srcImg)
         {
             Mat dstImg = srcImg.Clone();
@@ -873,7 +875,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("DNN_Caffe")]
+        [MethodCNName("DNN_Caffe"), NoneParam]
         public static Mat DNN_Caffe(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -916,7 +918,7 @@ namespace ImageHandle.Helpers
         /// </summary>
         /// <param name="srcImg"></param>
         /// <returns></returns>
-        [MethodCNName("DNN_TensorFlow")]
+        [MethodCNName("DNN_TensorFlow"), NoneParam]
         public static Mat DNN_TensorFlow(Mat srcImg)
         {
             Mat dstImg = new Mat();
@@ -982,7 +984,8 @@ namespace ImageHandle.Helpers
         /// <param name="srcImg"></param>
         /// <param name="mode">X, Y ,XY</param>
         /// <returns></returns>
-        [MethodCNName("图像翻转")]
+        [MethodCNName("图像翻转"), ScriptParam("mode", ParamType.Enum, "", "翻转模式")]
+        [EnumParam("方向")]
         public static Mat Flip(Mat srcImg, FlipMode mode)
         {
             Mat dstImg = new Mat();
@@ -997,6 +1000,8 @@ namespace ImageHandle.Helpers
         /// <param name="meanV"></param>
         /// <returns></returns>
         [MethodCNName("图像素描")]
+        [NumberParam("像素值", NumberParamTypeEnum.Integer, "Int类型", "128")]
+        [ScriptParam("meanV", ParamType.Interger, "128", "像素值")]
         public static Mat Sketch(Mat srcImg, int meanV = 127)
         {
             Mat gray = new Mat();
@@ -1023,6 +1028,8 @@ namespace ImageHandle.Helpers
         /// <param name="kvalue"></param>
         /// <returns></returns>
         [MethodCNName("图像浮雕")]
+        [NumberParam("像素值", NumberParamTypeEnum.Integer, "Int类型", "128")]
+        [ScriptParam("kvalue", ParamType.Interger, "128", "像素值")]
         public static Mat Emboss(Mat srcImg, int kvalue = 150)
         {
             Mat dstImg = Mat.Zeros(srcImg.Size(), MatType.CV_8UC1);
@@ -1051,6 +1058,8 @@ namespace ImageHandle.Helpers
         /// <param name="srcImg"></param>
         /// <param name="aplha"></param>
         [MethodCNName("快速去雾")]
+        [NumberParam("去雾因子", NumberParamTypeEnum.Double, "double类型", "0.85")]
+        [ScriptParam("aplha", ParamType.Double, "0.85", "去雾因子")]
         public static Mat FastDehazing(Mat srcImg, double aplha)
         {
             Mat dstImg = srcImg.Clone();
@@ -1142,6 +1151,8 @@ namespace ImageHandle.Helpers
         /// <param name="ksize">毛玻璃大小  2n+1 </param>
         /// <returns></returns>
         [MethodCNName("毛玻璃特效")]
+        [NumberParam("毛玻璃大小", NumberParamTypeEnum.Integer, "int类型，，奇数，大于0", "5")]
+        [ScriptParam("ksize", ParamType.Interger, "5", "毛玻璃大小")]
         public static Mat GroundGlass(Mat srcImg, int ksize = 5)
         {
             Mat dstImg = srcImg.Clone();
@@ -1263,6 +1274,8 @@ namespace ImageHandle.Helpers
         /// <param name="lu"></param>
         /// <returns></returns>
         [MethodCNName("图像透明化")]
+        [NumberParam("透明度", NumberParamTypeEnum.Double, "double类型", "1")]
+        [ScriptParam("lu", ParamType.Double, "1", "透明度")]
         public static Mat Lucency(Mat srcImg, double lu)
         {
             Mat dstImg = new Mat();
@@ -1297,6 +1310,8 @@ namespace ImageHandle.Helpers
         /// <param name="types"></param>
         /// <returns></returns>
         [MethodCNName("伪颜色增强")]
+        [EnumParam("方式")]
+        [ScriptParam("types", ParamType.Enum, "", "方式")]
         public static Mat ApplyColorMap(Mat srcImg, OpenCvSharp.ColormapTypes types)
         {
             Mat dstImg = new Mat();
@@ -1311,6 +1326,8 @@ namespace ImageHandle.Helpers
         /// <param name="num"></param>
         /// <returns></returns>
         [MethodCNName("加盐噪声")]
+        [NumberParam("噪声点数", NumberParamTypeEnum.Integer, "int类型", "2500")]
+        [ScriptParam("num", ParamType.Interger, "2500", "噪声点数")]
         public static Mat AddSaltNosie(Mat srcImg, int num)
         {
             Mat dstImg = srcImg.Clone();
@@ -1331,6 +1348,8 @@ namespace ImageHandle.Helpers
         /// <param name="num"></param>
         /// <returns></returns>、
         [MethodCNName("加椒噪声")]
+        [NumberParam("噪声点数", NumberParamTypeEnum.Integer, "int类型", "2500")]
+        [ScriptParam("num", ParamType.Interger, "2500", "噪声点数")]
         public static Mat AddPepperNoise(Mat srcImg, int num)
         {
             Mat dstImg = srcImg.Clone();
@@ -1351,6 +1370,8 @@ namespace ImageHandle.Helpers
         /// <param name="num"></param>
         /// <returns></returns>
         [MethodCNName("加椒盐噪声")]
+        [NumberParam("噪声点数", NumberParamTypeEnum.Integer, "int类型", "2500")]
+        [ScriptParam("num", ParamType.Interger, "2500", "噪声点数")]
         public static Mat AddSaltPepperNoise(Mat srcImg, int num)
         {
             OpenCvSharp.Vec3b[] SaltPepperNoises = new OpenCvSharp.Vec3b[2]
@@ -1377,6 +1398,8 @@ namespace ImageHandle.Helpers
         /// <param name="num"></param>
         /// <returns></returns>
         [MethodCNName("加高斯噪声")]
+        [NumberParam("噪声点数", NumberParamTypeEnum.Integer, "int类型", "2500")]
+        [ScriptParam("num", ParamType.Interger, "2500", "噪声点数")]
         public static Mat AddGaussianNoise(Mat srcImg, int num)
         {
             Mat dstImg = srcImg.Clone();
@@ -1413,6 +1436,8 @@ namespace ImageHandle.Helpers
         /// <param name="ksize"></param>
         /// <returns></returns>
         [MethodCNName("均值滤波")]
+        [NumberParam("滤波器大小", NumberParamTypeEnum.Integer, "int类型,奇数", "3")]
+        [ScriptParam("ksize", ParamType.Interger, "3", "滤波器大小")]
         public static Mat Blur(Mat srcImg, int ksize = 3)
         {
             Mat dstImg = new Mat();
@@ -1428,6 +1453,8 @@ namespace ImageHandle.Helpers
         /// <param name="ksize"></param>
         /// <returns></returns>
         [MethodCNName("中值滤波")]
+        [NumberParam("滤波器大小", NumberParamTypeEnum.Integer, "int类型,奇数", "3")]
+        [ScriptParam("ksize", ParamType.Interger, "3", "滤波器大小")]
         public static Mat MedianBlur(Mat srcImg, int ksize = 3)
         {
             Mat dstImg = new Mat();
@@ -1442,6 +1469,8 @@ namespace ImageHandle.Helpers
         /// <param name="ksize"></param>
         /// <returns></returns>
         [MethodCNName("双边滤波")]
+        [NumberParam("滤波器大小", NumberParamTypeEnum.Integer, "int类型,奇数", "3")]
+        [ScriptParam("ksize", ParamType.Interger, "3", "滤波器大小")]
         public static Mat BilateralFilter(Mat srcImg, int ksize = 3)
         {
             Mat dstImg = new Mat();
@@ -1456,6 +1485,8 @@ namespace ImageHandle.Helpers
         /// <param name="ksize"></param>
         /// <returns></returns>
         [MethodCNName("高斯滤波")]
+        [NumberParam("滤波器大小", NumberParamTypeEnum.Integer, "int类型,奇数", "3")]
+        [ScriptParam("ksize", ParamType.Interger, "3", "滤波器大小")]
         public static Mat GaussianBlur(Mat srcImg, int ksize = 3)
         {
             Mat dstImg = new Mat();
@@ -1472,6 +1503,8 @@ namespace ImageHandle.Helpers
         /// <param name="ksize"></param>
         /// <returns></returns>
         [MethodCNName("方盒滤波")]
+        [NumberParam("滤波器大小", NumberParamTypeEnum.Integer, "int类型,奇数", "3")]
+        [ScriptParam("ksize", ParamType.Interger, "3", "滤波器大小")]
         public static Mat BoxFilter(Mat srcImg, int ksize = 3)
         {
             Mat dstImg = new Mat();
@@ -1488,6 +1521,8 @@ namespace ImageHandle.Helpers
         /// <param name="times"></param>
         /// <returns></returns>
         [MethodCNName("金字塔向下取样")]
+        [NumberParam("取样次数", NumberParamTypeEnum.Integer, "int类型,不宜太大", "1")]
+        [ScriptParam("times", ParamType.Interger, "1", "取样次数")]
         public static Mat PyrDown(Mat srcImg, int times)
         {
             Mat tempMat = srcImg.Clone();
@@ -1514,6 +1549,8 @@ namespace ImageHandle.Helpers
         /// <param name="times"></param>
         /// <returns></returns>
         [MethodCNName("金字塔向上取样")]
+        [NumberParam("取样次数", NumberParamTypeEnum.Integer, "int类型,不宜太大", "1")]
+        [ScriptParam("times", ParamType.Interger, "1", "取样次数")]
         public static Mat PyrUp(Mat srcImg, int times)
         {
             Mat tempMat = srcImg.Clone();
@@ -1540,6 +1577,8 @@ namespace ImageHandle.Helpers
         /// <param name="minArea"></param>
         /// <returns></returns>
         [MethodCNName("外接矩形")]
+        [NumberParam("最小面积", NumberParamTypeEnum.Double, "double类型", "300")]
+        [ScriptParam("minArea", ParamType.Double, "300", "最小面积")]
         public static Mat BoundingRect(Mat srcImg, double minArea = 300)
         {
             Mat dstImg = new Mat();
@@ -1575,6 +1614,8 @@ namespace ImageHandle.Helpers
         /// <param name="minArea"></param>
         /// <returns></returns>
         [MethodCNName("外接圆")]
+        [NumberParam("最小面积", NumberParamTypeEnum.Double, "double类型", "300")]
+        [ScriptParam("minArea", ParamType.Double, "300", "最小面积")]
         public static Mat BoundingCircle(Mat srcImg, double minArea = 300)
         {
             Mat dstImg = new Mat();
@@ -1611,6 +1652,8 @@ namespace ImageHandle.Helpers
         /// <param name="type"></param>
         /// <returns></returns>
         [MethodCNName("边缘检测")]
+        [EnumParam("检测算法")]
+        [ScriptParam("type", ParamType.Enum, "", "检测算法")]
         public static Mat Edge(Mat srcImg, EdegTypeEnum type)
         {
             Mat dstImg = new Mat();
@@ -1765,6 +1808,8 @@ namespace ImageHandle.Helpers
         /// 特征检测 根据不同分类器
         /// </summary>
         [MethodCNName("特征检测")]
+        [EnumParam("分类器")]
+        [ScriptParam("classifierEnum", ParamType.Enum, "", "分类器")]
         public static Mat FeatureRecogn(Mat srcImg, ClassifierEnum classifierEnum)
         {
             Mat dstImg = new Mat();
@@ -1828,6 +1873,8 @@ namespace ImageHandle.Helpers
         #region 皮肤检测
 
         [MethodCNName("皮肤检测")]
+        [EnumParam("算法")]
+        [ScriptParam("skinDefectEnum", ParamType.Enum, "", "算法")]
         public static Mat SkinDefect(Mat srcImg, SkinDefectEnum skinDefectEnum)
         {
             Mat dstImg = new Mat();
@@ -2000,6 +2047,8 @@ namespace ImageHandle.Helpers
         /// <param name="direction"></param>
         /// <returns></returns>
         [MethodCNName("图像折叠")]
+        [EnumParam("折叠方向")]
+        [ScriptParam("direction", ParamType.Enum, "", "折叠方向")]
         public static Mat CompleteSymm(Mat srcImg, SymmDirection direction)
         {
             //转化成方阵
@@ -2019,6 +2068,8 @@ namespace ImageHandle.Helpers
         /// <param name="bGREnum"></param>
         /// <returns></returns>
         [MethodCNName("单通道显示")]
+        [EnumParam("通道")]
+        [ScriptParam("bGREnum", ParamType.Enum, "", "通道")]
         public static Mat BGRSingle(Mat src, BGREnum bGREnum)
         {
             float ratio = 1; // 增强比例
@@ -2945,6 +2996,8 @@ namespace ImageHandle.Helpers
         /// <param name="times"></param>
         /// <returns></returns>
         [MethodCNName("形态学操作")]
+        [NoScript("暂时不支持Size 参数输入")]
+        [ScriptParam("shape", ParamType.Enum, "", "结构元")]
         public static Mat Morphology(Mat srcImg, MorphShapes shape, OpenCvSharp.Size size, MorphTypes type, int times = 1)
         {
             Mat dstImg = new Mat();
@@ -2959,6 +3012,9 @@ namespace ImageHandle.Helpers
         }
 
         [MethodCNName("金字塔分割")]
+        [ScriptParam("sp", ParamType.Double, "1", "sp")]
+        [ScriptParam("sr", ParamType.Double, "1", "sr")]
+        [ScriptParam("maxlevel", ParamType.Interger, "1", "最大层级")]
         public static Mat MeanShiftFilter(Mat srcImg, double sp, double sr, int maxlevel)
         {
             Mat dstImg = new Mat();
@@ -2974,6 +3030,8 @@ namespace ImageHandle.Helpers
         /// <param name="nx">水平</param>
         /// <returns></returns>
         [MethodCNName("图像堆叠")]
+        [ScriptParam("ny", ParamType.Interger, "1", "竖直数量")]
+        [ScriptParam("nx", ParamType.Interger, "1", "水平数量")]
         public static Mat Repeat(Mat srcImg, int ny, int nx)
         {
             Mat dstImg = new Mat();
@@ -2989,6 +3047,8 @@ namespace ImageHandle.Helpers
         /// <param name="size"></param>
         /// <returns></returns>
         [MethodCNName("距离变换")]
+        [ScriptParam("type", ParamType.Enum, "", "变换方式")]
+        [ScriptParam("size", ParamType.Enum, "", "大小")]
         public static Mat DistanceTranForm(Mat srcImg, OpenCvSharp.DistanceTypes type, OpenCvSharp.DistanceTransformMasks size)
         {
             Mat dstImg = new Mat();
@@ -3004,6 +3064,7 @@ namespace ImageHandle.Helpers
         }
 
         [MethodCNName("极空间变换")]
+        [NoScript("暂时不支持center 参数输入")]
         public static Mat Polar(Mat srcImg, OpenCvSharp.Point2f center, double maxRadius, OpenCvSharp.InterpolationFlags flag, PolarMode mode)
         {
             Mat dstImg = new Mat();

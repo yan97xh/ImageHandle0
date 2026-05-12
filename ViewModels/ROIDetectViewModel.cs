@@ -1,4 +1,6 @@
-﻿using Microsoft.Win32;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using OpenCvSharp;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -9,66 +11,27 @@ using System.Windows.Media;
 
 namespace ImageHandle.ViewModels
 {
-    internal class ROIDetectViewModel : ViewModelBase
+    internal partial class ROIDetectViewModel : ObservableObject
     {
         private readonly double defaultROIWidth = 100;
         private readonly double defaultROIHeight = 100;
 
         public ROIDetectViewModel()
         {
-            InitROICommand = new Commands.Command<System.Windows.Point>(InitROI);
-
             _matCollection = new ObservableCollection<Mat>();
             _matCollection.CollectionChanged += OnCollectionChanged;
-
-            SelectSrcImgCommand = new Commands.RelayCommand(SelectSrcImg);
-            SaveImageCommand = new Commands.RelayCommand(SaveImage);
-
-            ROIRectangleColorCommand = new Commands.RelayCommand(ProcessROIRectangleColor);
-            ROIDetectCommand = new Commands.RelayCommand(ROIDetect);
-            ClearROICommand = new Commands.RelayCommand(ClearROI);
         }
 
-        #region ROI
-
+        [ObservableProperty]
         private System.Windows.Point topLeftP;
 
-        public System.Windows.Point TopLeftP
-        {
-            get { return topLeftP; }
-            set
-            {
-                topLeftP = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private System.Windows.Point bottomRightP;
 
-        public System.Windows.Point BottomRightP
-        {
-            get { return bottomRightP; }
-            set
-            {
-                bottomRightP = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private bool isROIDetectEnabled = false;
 
-        public bool IsROIDetectEnabled
-        {
-            get { return isROIDetectEnabled; }
-            set
-            {
-                isROIDetectEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand InitROICommand { get; }
-
+        [RelayCommand]
         private void InitROI(System.Windows.Point center)
         {
             if (string.IsNullOrEmpty(SrcImgPath))
@@ -86,58 +49,23 @@ namespace ImageHandle.ViewModels
             BottomRightP = new System.Windows.Point(center.X + defaultROIWidth / 2, center.Y + defaultROIHeight / 2);
         }
 
-        public ICommand ClearROICommand { get; }
-
+        [RelayCommand]
         private void ClearROI()
         {
             IsROIDetectEnabled = false;
         }
 
-        #endregion ROI
-
-        #region 输入输出图像路径
-
+        [ObservableProperty]
         private string _srcImgPath;
 
-        public string SrcImgPath
-        {
-            get => _srcImgPath;
-            set
-            {
-                _srcImgPath = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private string _saveImagePath;
 
-        public string SaveImagePath
-        {
-            get => _saveImagePath;
-            set
-            {
-                _saveImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入输出图像路径
-
-        #region 图像集合 用于保存每步操作 可撤销
-
+        [ObservableProperty]
         private ObservableCollection<Mat> _matCollection = new ObservableCollection<Mat>();
-        public ObservableCollection<Mat> MatCollection => _matCollection;
-        private Mat _lastMat;
 
-        public Mat LastMat
-        {
-            get => _lastMat;
-            set
-            {
-                _lastMat = value;
-                OnPropertyChanged();
-            }
-        }
+        [ObservableProperty]
+        private Mat _lastMat;
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -160,12 +88,7 @@ namespace ImageHandle.ViewModels
             return last;
         }
 
-        #endregion 图像集合 用于保存每步操作 可撤销
-
-        #region 选择输入图像命令
-
-        public ICommand SelectSrcImgCommand { get; }
-
+        [RelayCommand]
         private void SelectSrcImg()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -184,12 +107,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择输入图像命令
-
-        #region 保存输出图像命令
-
-        public ICommand SaveImageCommand { get; }
-
+        [RelayCommand]
         private void SaveImage()
         {
             if (LastMat == null)
@@ -221,24 +139,12 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 保存输出图像命令
-
         #region 选择颜色的命令
 
+        [ObservableProperty]
         private Brush _rOIRectangleColor = Brushes.Red;
 
-        public Brush ROIRectangleColor
-        {
-            get { return _rOIRectangleColor; }
-            set
-            {
-                _rOIRectangleColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand ROIRectangleColorCommand { get; }
-
+        [RelayCommand]
         private void ProcessROIRectangleColor()
         {
             var colorDialog = new System.Windows.Forms.ColorDialog();
@@ -259,36 +165,15 @@ namespace ImageHandle.ViewModels
 
         #region 抠图
 
+        [ObservableProperty]
         private Mat _rOIDetectMat;
 
-        public Mat ROIDetectMat
-        {
-            get { return _rOIDetectMat; }
-            set
-            {
-                _rOIDetectMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand ROIDetectCommand { get; }
-
         // 显示控件上的图像展示尺寸（由视图层设置：通常是 Image 或 ROICanvas 的实际显示尺寸）
+        [ObservableProperty]
         private double _imageDisplayWidth;
 
-        public double ImageDisplayWidth
-        {
-            get => _imageDisplayWidth;
-            set { _imageDisplayWidth = value; OnPropertyChanged(); }
-        }
-
+        [ObservableProperty]
         private double _imageDisplayHeight;
-
-        public double ImageDisplayHeight
-        {
-            get => _imageDisplayHeight;
-            set { _imageDisplayHeight = value; OnPropertyChanged(); }
-        }
 
         // 将 TopLeftP/BottomRightP（画布/显示坐标）转换为图像像素坐标（OpenCvSharp.Rect）
         private OpenCvSharp.Rect? GetImageRect()
@@ -337,6 +222,7 @@ namespace ImageHandle.ViewModels
             return new OpenCvSharp.Rect(x, y, width, height);
         }
 
+        [RelayCommand]
         private void ROIDetect()
         {
             if (LastMat == null)

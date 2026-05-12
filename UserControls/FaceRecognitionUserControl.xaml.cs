@@ -1,4 +1,5 @@
-﻿using ImageHandle.ViewModels;
+﻿using ImageHandle.Attributes;
+using ImageHandle.ViewModels;
 using ImageHandle.Views;
 using OpenCvSharp;
 using System.Windows;
@@ -11,6 +12,7 @@ namespace ImageHandle.UserControls
     /// <summary>
     /// FaceRecognitionUserControl.xaml 的交互逻辑
     /// </summary>
+    [NavigationPage(Models.PageEnum.FaceRecognitionPage)]
     public partial class FaceRecognitionUserControl : UserControl
     {
         private FaceRecognitionViewModel _viewModel;
@@ -146,6 +148,8 @@ namespace ImageHandle.UserControls
 
         private DateTime _lastClickTime;
         private const int DoubleClickThreshold = 300; // 双击时间间隔阈值，单位为毫秒
+
+        // 双击事件处理方法
         private void pbxTrainShow_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if ((DateTime.Now - _lastClickTime).TotalMilliseconds < DoubleClickThreshold)

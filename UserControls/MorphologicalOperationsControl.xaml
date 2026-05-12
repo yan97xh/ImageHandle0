@@ -41,7 +41,7 @@
                                     Width="120"
                                     Style="{StaticResource ImgOperateBtnStyle}"
                                     Content="{Binding DisplayName}"
-                                    Command="{Binding DataContext.MorphologicalCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    Command="{Binding DataContext.ProcessMorphologicalOperationsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                     CommandParameter="{Binding operation}"
                                     ToolTip="{Binding Remark}"
                                     FontSize="16" />

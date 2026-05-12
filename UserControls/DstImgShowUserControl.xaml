@@ -36,7 +36,7 @@
             Height="25"
             Margin="0,0,2,2"
             HorizontalAlignment="Right"
-            VerticalAlignment="Center" 
+            VerticalAlignment="Center"
             Content="清空"
             Click="Button_Click" />
         <!--#endregion-->
@@ -46,7 +46,7 @@
             Width="335"
             Height="335"
             Source="{Binding DstImageSource, Mode=TwoWay, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource matToImageSourceConverter}}"
-            Stretch="Fill"
+            Stretch="{Binding ImageStretch, RelativeSource={RelativeSource AncestorType=UserControl}}"
             MouseLeftButtonDown="Image_MouseLeftButtonDown" />
         <StackPanel
             Grid.Row="2"

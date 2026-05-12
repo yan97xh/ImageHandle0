@@ -11,7 +11,7 @@
 
     public class ScriptParamModel
     {
-        public string Name { get; set; }
+        public string Name { get; set; } 
         public ParamType Type { get; set; }
         public string Value { get; set; }
         public string ParamDisplayName { get; set; }
@@ -42,6 +42,10 @@
             }
         }
 
+        public ScriptParamModel()
+        {
+                
+        }
         public bool CheckValueValid()
         {
             return Type switch
@@ -66,6 +70,27 @@
                 ParamType.Enum => Enum.Parse(_type, Value),
                 _ => throw new NotSupportedException($"不支持的参数类型: {Type}"),
             };
+        }
+ 
+        public ScriptParamModel DeepClone()
+        {
+            var clone = new ScriptParamModel
+                        {
+                            Name = this.Name,
+                            Type = this.Type,
+                            Value = this.Value,
+                            ParamDisplayName = this.ParamDisplayName,
+                            Remark = this.Remark,
+                            _type = this._type
+                        };
+        
+            if (this.ParamArrays != null)
+            {
+                clone.ParamArrays = new string[this.ParamArrays.Length];
+                Array.Copy(this.ParamArrays, clone.ParamArrays, this.ParamArrays.Length);
+            }
+        
+            return clone;
         }
     }
 }

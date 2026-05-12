@@ -1,4 +1,6 @@
-﻿using ImageHandle.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ImageHandle.Helpers;
 using OpenCvSharp;
 using System.IO;
 using System.Windows;
@@ -8,71 +10,26 @@ using System.Windows.Media.Imaging;
 
 namespace ImageHandle.ViewModels
 {
-    public class TextViewModel : ViewModelBase
+    public partial class TextViewModel : ObservableObject
     {
         public TextViewModel()
         {
-            FontStyleItemsArray = Enum.GetNames(typeof(HersheyFonts));
+            // 文本粗细
             ThincknessItemsArray = ["1", "2", "3", "4", "5"];
-            FontColorCommand = new Commands.RelayCommand(ProcessFontColor);
-            WriteTextCommand = new Commands.RelayCommand(ProcessWriteText);
-            OCRCommand = new Commands.RelayCommand(ProcessOCR);
-            QRCodeColorCommand = new Commands.RelayCommand(ProcessQRCodeColor);
-            QRCodeCreateCommand = new Commands.RelayCommand(QRCodeCreate);
-            QRCodeDetectCommand = new Commands.RelayCommand(QRCodeDetect);
         }
 
-        #region 输入图像
-
+        [ObservableProperty]
         private string _srcImagePath;
 
-        public string SrcImagePath
-        {
-            get => _srcImagePath;
-            set
-            {
-                _srcImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入图像
-
-        #region 输出图像
-
+        [ObservableProperty]
         private Mat _dstMat;
-
-        public Mat DstMat
-        {
-            get => _dstMat;
-            set
-            {
-                _dstMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输出图像
 
         #region 文本输入
 
-        private System.Windows.Media.Color _writeFontColor = Colors.Red;
+        [ObservableProperty]
+        private System.Windows.Media.Color _writeFontColor = Colors.Red;     // 写入文本的字体颜色
 
-        // 写入文本的字体颜色
-        public System.Windows.Media.Color WriteFontColor
-        {
-            get { return _writeFontColor; }
-            set
-            {
-                _writeFontColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #region 选择颜色的命令
-
-        public ICommand FontColorCommand { get; }
-
+        [RelayCommand]
         private void ProcessFontColor()
         {
             var colorDialog = new System.Windows.Forms.ColorDialog();
@@ -88,83 +45,34 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择颜色的命令
+        [ObservableProperty]
+        private string _writeText;
 
-        private string _text;
+        [ObservableProperty]
+        private double _writeFontScale = 2.0;
 
-        //写入文本
-        public string Text
-        {
-            get => _text;
-            set
-            {
-                _text = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private double _fontScale = 2.0;
-
-        public double FontScale
-        {
-            get => _fontScale;
-            set
-            {
-                _fontScale = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private int _locationX = 0;
 
-        public int LocationX
-        {
-            get => _locationX;
-            set
-            {
-                _locationX = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private int _locationY = 0;
 
-        public int LocationY
-        {
-            get => _locationY;
-            set
-            {
-                _locationY = value;
-                OnPropertyChanged();
-            }
-        }
+        [ObservableProperty]
+        private int _writeTextThinckness = 2;
 
-        private int _thinckness = 2;
-
-        public int Thinckness
+        partial void OnWriteTextThincknessChanged(int value)
         {
-            get => _thinckness;
-            set
-            {
-                _thinckness = value;
-                OnPropertyChanged();
-                ProcessFontStyleShow();
-            }
+            ProcessFontStyleShow();
         }
 
         public string[] ThincknessItemsArray { get; }
 
+        [ObservableProperty]
         private string _fontStyle;
 
-        public string FontStyle
+        partial void OnFontStyleChanged(string value)
         {
-            get => _fontStyle;
-            set
-            {
-                _fontStyle = value;
-                OnPropertyChanged();
-                ProcessFontStyleShow();
-            }
+            ProcessFontStyleShow();
         }
 
         public string[] FontStyleItemsArray
@@ -172,18 +80,12 @@ namespace ImageHandle.ViewModels
             get;
         }
 
+        [ObservableProperty]
         private Mat _fontShowMat;
 
-        public Mat FontShowMat
-        {
-            get => _fontShowMat;
-            set
-            {
-                _fontShowMat = value;
-                OnPropertyChanged();
-            }
-        }
-
+        /// <summary>
+        /// 当前选择的字体样式展示
+        /// </summary>
         private void ProcessFontStyleShow()
         {
             if (Enum.TryParse(typeof(HersheyFonts), _fontStyle, true, out object result) == false)
@@ -229,12 +131,11 @@ namespace ImageHandle.ViewModels
             }
 
             PP = new OpenCvSharp.Point(10, 130);
-            OpenCvSharp.Cv2.PutText(srcImg, "AaBb", PP, hersheyFonts, 3, Scalar.Black, _thinckness);
+            OpenCvSharp.Cv2.PutText(srcImg, "AaBb", PP, hersheyFonts, 3, Scalar.Black, _writeTextThinckness);
             FontShowMat = srcImg;
         }
 
-        public ICommand WriteTextCommand { get; }
-
+        [RelayCommand]
         private void ProcessWriteText()
         {
             if (string.IsNullOrEmpty(_srcImagePath))
@@ -248,7 +149,7 @@ namespace ImageHandle.ViewModels
                 return;
             }
             Mat srcImg = new Mat(_srcImagePath);
-            if (string.IsNullOrWhiteSpace(_text))
+            if (string.IsNullOrWhiteSpace(_writeText))
             {
                 MessageBox.Show("没有需要写入的文本内容");
                 return;
@@ -264,7 +165,7 @@ namespace ImageHandle.ViewModels
             HersheyFonts hersheyFonts = (HersheyFonts)result;
 
             Scalar scalar = Scalar.FromRgb(_writeFontColor.R, _writeFontColor.G, _writeFontColor.B);
-            OpenCvSharp.Cv2.PutText(srcImg, _text, location, hersheyFonts, _fontScale, scalar, _thinckness);
+            OpenCvSharp.Cv2.PutText(srcImg, _writeText, location, hersheyFonts, _writeFontScale, scalar, _writeTextThinckness);
             DstMat = srcImg;
         }
 
@@ -272,8 +173,7 @@ namespace ImageHandle.ViewModels
 
         #region 文字识别
 
-        public ICommand OCRCommand { get; }
-
+        [RelayCommand]
         private void ProcessOCR()
         {
             if (string.IsNullOrEmpty(_srcImagePath))
@@ -295,22 +195,10 @@ namespace ImageHandle.ViewModels
 
         #region 二维码生成
 
-        private System.Windows.Media.Color _qrCodeColor = Colors.Black;
+        [ObservableProperty]
+        private System.Windows.Media.Color _QRCodeColor = Colors.Black;
 
-        public System.Windows.Media.Color QRCodeColor
-        {
-            get => _qrCodeColor;
-            set
-            {
-                _qrCodeColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #region 选择颜色的命令
-
-        public ICommand QRCodeColorCommand { get; }
-
+        [RelayCommand]
         private void ProcessQRCodeColor()
         {
             var colorDialog = new System.Windows.Forms.ColorDialog();
@@ -326,49 +214,19 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择颜色的命令
+        [ObservableProperty]
+        private string _QRCodeMessage;
 
-        private string _qrCodeMessage;
-
-        public string QRCodeMessage
-        {
-            get => _qrCodeMessage;
-            set
-            {
-                _qrCodeMessage = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private bool _blankSide = true;
 
-        public bool BlankSide
-        {
-            get => _blankSide;
-            set
-            {
-                _blankSide = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private bool _logo = false;
 
-        public bool Logo
-        {
-            get => _logo;
-            set
-            {
-                _logo = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand QRCodeCreateCommand { get; }
-
+        [RelayCommand]
         private void QRCodeCreate()
         {
-            if (string.IsNullOrWhiteSpace(_qrCodeMessage))
+            if (string.IsNullOrWhiteSpace(_QRCodeMessage))
             {
                 MessageBox.Show("无二维码信息");
                 return;
@@ -376,7 +234,7 @@ namespace ImageHandle.ViewModels
             BitmapImage qrImage = null;
             if (_logo == false)
             {
-                qrImage = ImageOperateMethods.GetNormalQRCode(_qrCodeMessage, 300, 256, 256, _blankSide, _qrCodeColor);
+                qrImage = ImageOperateMethods.GetNormalQRCode(_QRCodeMessage, 300, 256, 256, _blankSide, _QRCodeColor);
             }
             else
             {
@@ -391,7 +249,7 @@ namespace ImageHandle.ViewModels
                     return;
                 }
                 BitmapImage icon = new BitmapImage(new Uri(_srcImagePath));
-                qrImage = ImageOperateMethods.GetLogoQRCode(_qrCodeMessage, icon, 300, 256, 256, _blankSide, _qrCodeColor);
+                qrImage = ImageOperateMethods.GetLogoQRCode(_QRCodeMessage, icon, 300, 256, 256, _blankSide, _QRCodeColor);
             }
             DstMat = MatConverters.BitmapToMat(qrImage);
         }
@@ -400,20 +258,10 @@ namespace ImageHandle.ViewModels
 
         #region 二维码识别
 
-        private string _qrCodeDetectMsg;
+        [ObservableProperty]
+        private string _QRCodeDetectMsg;
 
-        public string QRCodeDetectMsg
-        {
-            get { return _qrCodeDetectMsg; }
-            set
-            {
-                _qrCodeDetectMsg = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand QRCodeDetectCommand { get; }
-
+        [RelayCommand]
         private void QRCodeDetect()
         {
             if (string.IsNullOrEmpty(_srcImagePath))

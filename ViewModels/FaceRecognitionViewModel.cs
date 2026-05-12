@@ -1,4 +1,6 @@
-﻿using OpenCvSharp;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using OpenCvSharp;
 using OpenCvSharp.Face;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -8,26 +10,13 @@ using System.Windows.Input;
 
 namespace ImageHandle.ViewModels
 {
-    public class FaceRecognitionViewModel : ViewModelBase
+    public partial class FaceRecognitionViewModel : ObservableObject
     {
         public FaceRecognitionViewModel()
         {
-            SelectSrcImgCommand = new Commands.RelayCommand(SelectSrcImg);
-            SaveImageCommand = new Commands.RelayCommand(SaveImage);
-            SelectTrainImgCommand = new Commands.RelayCommand(SelectTrainImg);
-            AddTrainImageCommand = new Commands.RelayCommand(AddTrainImage);
-
             LoadDirectory(_trainInfoPath);
-            ChangeTrainPathCommand = new Commands.RelayCommand(ChangeTrainPath);
-
-            RefreshTrainInfoCommand = new Commands.RelayCommand(RefreshTrainInfo);
-            TrainInfoCommand = new Commands.RelayCommand(TrainInfo);
-            FaceRecongnizeCommand = new Commands.RelayCommand(FaceRecongnize);
-
             TrainGroupName = GetNamesByGroupId(_trainGroupId);
         }
-
-        #region 变量定义
 
         private readonly OpenCvSharp.Size _trainImageSize = new OpenCvSharp.Size(100, 100);
         private bool _trainAgain = true;
@@ -36,132 +25,47 @@ namespace ImageHandle.ViewModels
         private Dictionary<int, string> _nameDic = new Dictionary<int, string>();
         private FaceRecognizer faceRecongnizer = FisherFaceRecognizer.Create();
 
-        #region 属性变量
-
+        [ObservableProperty]
         private string _srcImgPath;
+
+        [ObservableProperty]
         private string _trainImgPath;
+
+        [ObservableProperty]
         private string _saveImagePath;
+
+        [ObservableProperty]
         private Mat _lastMat;
+
+        [ObservableProperty]
         private Mat _trainMat;
+
+        [ObservableProperty]
         private Mat _preMat;
+
+        [ObservableProperty]
         private int _trainGroupId = 1;
+
+        partial void OnTrainGroupIdChanged(int value)
+        {
+            TrainGroupName = GetNamesByGroupId(value);
+        }
+
+        [ObservableProperty]
         private string _trainGroupName;
+
+        [ObservableProperty]
         private string _trainInfoPath = @"E:\FaceTrain\";
 
-        #endregion 属性变量
-
-        #endregion 变量定义
-
-        #region 属性
-
-        public string SrcImgPath
+        partial void OnTrainInfoPathChanged(string value)
         {
-            get => _srcImgPath;
-            set
-            {
-                _srcImgPath = value;
-                OnPropertyChanged();
-            }
+            LoadDirectory(value);
         }
 
-        public string TrainImgPath
-        {
-            get => _trainImgPath;
-            set
-            {
-                _trainImgPath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string SaveImagePath
-        {
-            get => _saveImagePath;
-            set
-            {
-                _saveImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Mat LastMat
-        {
-            get => _lastMat;
-            set
-            {
-                _lastMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Mat TrainMat
-        {
-            get => _trainMat;
-            set
-            {
-                _trainMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public Mat PreMat
-        {
-            get => _preMat;
-            set
-            {
-                _preMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int TrainGroupId
-        {
-            get => _trainGroupId;
-            set
-            {
-                _trainGroupId = value;
-                OnPropertyChanged();
-                TrainGroupName = GetNamesByGroupId(value);
-            }
-        }
-
-        public string TrainGroupName
-        {
-            get => _trainGroupName;
-            set
-            {
-                _trainGroupName = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string TrainInfoPath
-        {
-            get => _trainInfoPath;
-            set
-            {
-                _trainInfoPath = value;
-                OnPropertyChanged();
-                LoadDirectory(_trainInfoPath);
-            }
-        }
-
+        // 训练集路径 用于前台显示训练集文件夹结构
         public ObservableCollection<FileSystemItem> TrainPathItems { get; set; } = [];
 
-        public ICommand AddTrainImageCommand { get; }// 添加训练图像
-        public ICommand SelectSrcImgCommand { get; }
-        public ICommand SelectTrainImgCommand { get; }
-        public ICommand SaveImageCommand { get; }
-        public ICommand ChangeTrainPathCommand { get; }
-        public ICommand RefreshTrainInfoCommand { get; }
-        public ICommand TrainInfoCommand { get; }
-
-        public ICommand FaceRecongnizeCommand { get; }
-
-        #endregion 属性
-
-        #region 方法
-
+        [RelayCommand]
         private void SelectSrcImg()
         {
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
@@ -177,6 +81,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
+        [RelayCommand]
         private void SelectTrainImg()
         {
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
@@ -191,6 +96,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
+        [RelayCommand]
         private void SaveImage()
         {
             if (LastMat == null)
@@ -222,6 +128,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
+        [RelayCommand]
         private void AddTrainImage()
         {
             if (File.Exists(TrainImgPath) == false)
@@ -264,6 +171,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
+        [RelayCommand]
         private void ChangeTrainPath()
         {
             using (var dialog = new FolderBrowserDialog())
@@ -279,11 +187,13 @@ namespace ImageHandle.ViewModels
             }
         }
 
+        [RelayCommand]
         private void RefreshTrainInfo()
         {
             LoadDirectory(_trainInfoPath);
         }
 
+        [RelayCommand]
         private void FaceRecongnize()
         {
             if (string.IsNullOrWhiteSpace(_srcImgPath))
@@ -326,8 +236,6 @@ namespace ImageHandle.ViewModels
             }
             return "";
         }
-
-        #region 图像方法
 
         private void AddTrainImg(Mat src, OpenCvSharp.Size size, int groupId, string name)
         {
@@ -409,7 +317,7 @@ namespace ImageHandle.ViewModels
             {
                 MessageBox.Show("本地训练集小于两组,请添加训练集");
                 return false;
-            } 
+            }
             if (HasAtLeastTwoDirectoriesWithFiles(_trainInfoPath) == false)
             {
                 MessageBox.Show("本地训练集小于两组,请添加训练集");
@@ -437,6 +345,7 @@ namespace ImageHandle.ViewModels
             return true;
         }
 
+        [RelayCommand]
         private void TrainInfo()
         {
             if (!Directory.Exists(_trainInfoPath))
@@ -458,7 +367,7 @@ namespace ImageHandle.ViewModels
                 MessageBox.Show("训练失败: " + ex.Message);
             }
         }
- 
+
         private bool HasAtLeastTwoDirectoriesWithFiles(string directoryPath, string fileExtension = ".jpg")
         {
             if (string.IsNullOrWhiteSpace(directoryPath) || !Directory.Exists(directoryPath))
@@ -467,7 +376,7 @@ namespace ImageHandle.ViewModels
             try
             {
                 var directoryInfo = new DirectoryInfo(directoryPath);
-        
+
                 return directoryInfo.EnumerateDirectories()
                                     .Count(subDir => subDir.EnumerateFiles()
                                                            .Any(file => file.Extension.Equals(fileExtension, StringComparison.OrdinalIgnoreCase))) >= 2;
@@ -547,10 +456,6 @@ namespace ImageHandle.ViewModels
             }
             return mm;
         }
-
-        #endregion 图像方法
-
-        #endregion 方法
     }
 
     public class FileSystemItem

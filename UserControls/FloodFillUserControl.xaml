@@ -125,7 +125,7 @@
                     <!-- 上下实现效果一样 -->
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding FloodFillColorCommand}" />
+                            <i:InvokeCommandAction Command="{Binding ProcessFloodFillColorCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <!--#endregion-->
@@ -182,14 +182,14 @@
                     Height="35"
                     Margin="20,10"
                     Style="{StaticResource ImgOperateBtnStyle}"
-                    Command="{Binding FloodFillCommand}"
+                    Command="{Binding ProcessFloodFillCommand}"
                     Content="水漫" />
                 <Button
                     Width="100"
                     Height="35"
                     Margin="30,10"
                     Style="{StaticResource ImgOperateBtnStyle}"
-                    Command="{Binding RevocationCommand}"
+                    Command="{Binding ProcessRevocationCommand}"
                     Content="撤销" />
                 <Button
                     Width="100"

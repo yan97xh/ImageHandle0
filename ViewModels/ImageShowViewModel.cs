@@ -1,59 +1,31 @@
-﻿using ImageHandle.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ImageHandle.Attributes;
+using ImageHandle.Helpers;
 using ImageHandle.Models;
 using OpenCvSharp;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Numerics;
+using System.Reflection;
 using System.Windows;
-using System.Windows.Input;
 
 namespace ImageHandle.ViewModels
 {
-    public class ImageShowViewModel : ViewModelBase
+    public partial class ImageShowViewModel : ObservableObject
     {
         public ImageShowViewModel()
         {
-            NoneParamOpCommand = new Commands.Command<ImgOpNoneParamEnum>(ProcessImageNoneParam);
             InitImgOpNoneParam();
-
-            OneParamNumOpCommand = new Commands.Command<ImgOpOneParamNumEnum>(ProcessImageOneParamNum);
             InitImgOpOneParamNum();
-
-            OneParamEnumOpCommand = new Commands.Command<ImgOpOneParamEnumEnum>(ProcessImageOneParamEnum);
             InitImgOpOneParamEnum();
         }
 
-        #region 输入图像
-
+        [ObservableProperty]
         private string _srcImagePath;
 
-        public string SrcImagePath
-        {
-            get => _srcImagePath;
-            set
-            {
-                _srcImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入图像
-
-        #region 输出图像
-
-        private Mat _dstMat;
-
-        public Mat DstMat
-        {
-            get => _dstMat;
-            set
-            {
-                _dstMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输出图像
+        [ObservableProperty]
+        private Mat dstMat;
 
         #region 图像单操作 无参
 
@@ -64,45 +36,27 @@ namespace ImageHandle.ViewModels
 
         private void InitImgOpNoneParam()
         {
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.CvtColorToGray, ImageOperateMethods.CvtColorToGray));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.CvtColorToLab, ImageOperateMethods.CvtColorToLab));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.CvtColorToHSV, ImageOperateMethods.CvtColorToHSV));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.CvtColorToRGB, ImageOperateMethods.CvtColorToRGB));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.EqualizeHist, ImageOperateMethods.EqualizeHist));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Negation, ImageOperateMethods.Negation));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Otsu, ImageOperateMethods.Otsu));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.RetroEffect, ImageOperateMethods.RetroEffect));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.FusedCastEffect, ImageOperateMethods.FusedCastEffect));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.FrozenEffect, ImageOperateMethods.FrozenEffect));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.ComicEffect, ImageOperateMethods.ComicEffect));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.FleetingEffect, ImageOperateMethods.FleetingEffect));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.USM, ImageOperateMethods.USM));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.AutoWhithBalance, ImageOperateMethods.AutoWhithBalance));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Buffing, ImageOperateMethods.Buffing));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Whitening, ImageOperateMethods.Whitening));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.LowIlluminationEnhance, ImageOperateMethods.LowIlluminationEnhance));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Transpose, ImageOperateMethods.Transpose));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Smooth, ImageOperateMethods.Smooth));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.WaveletTransform, ImageOperateMethods.WaveletTransform));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.SepFilter2D, ImageOperateMethods.SepFilter2D));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Remaping, ImageOperateMethods.Remaping));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Perspect, ImageOperateMethods.Perspect));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Shear, ImageOperateMethods.Shear));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.LineCorrect, ImageOperateMethods.LineCorrect));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.DCT, ImageOperateMethods.DCT));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Contours, ImageOperateMethods.Contours));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.Hull, ImageOperateMethods.Hull));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.ConvexityDefects, ImageOperateMethods.ConvexityDefects));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.DNN_Caffe, ImageOperateMethods.DNN_Caffe));
-            OperationsNoneParam.Add(new ImgOperateNoneParam(ImgOpNoneParamEnum.DNN_TensorFlow, ImageOperateMethods.DNN_TensorFlow));
+            List<MethodInfo> methods = GetMethodsWithAttribute<NoneParamAttribute>(typeof(ImageOperateMethods));
+            foreach (ImgOpNoneParamEnum item in Enum.GetValues<ImgOpNoneParamEnum>())
+            {
+                MethodInfo method = methods.FirstOrDefault(m => m.Name == item.ToString());
+                if (method != null)
+                {
+                    Func<Mat, Mat> func = (Func<Mat, Mat>)Delegate.CreateDelegate(typeof(Func<Mat, Mat>), method);
+                    OperationsNoneParam.Add(new ImgOperateNoneParam(item, func));
+                }
+                else
+                {
+                    OperationsNoneParam.Add(new ImgOperateNoneParam(item, null));
+                }
+            }
         }
-
-        public ICommand NoneParamOpCommand { get; }
 
         /// <summary>
         /// 图像处理 无参数方法
         /// </summary>
         /// <param name="operation"></param>
+        [RelayCommand]
         private void ProcessImageNoneParam(ImgOpNoneParamEnum operation)
         {
             if (string.IsNullOrEmpty(_srcImagePath))
@@ -117,7 +71,7 @@ namespace ImageHandle.ViewModels
             }
             Mat srcImg = new Mat(_srcImagePath);
             ImgOperateNoneParam singalOperate = OperationsNoneParam.First(x => x.OperationType == operation);
-            if (singalOperate == null)
+            if (singalOperate == null || singalOperate.Func == null)
             {
                 MessageBox.Show($"方法:{operation}未注册");
                 return;
@@ -136,78 +90,33 @@ namespace ImageHandle.ViewModels
 
         private void InitImgOpOneParamNum()
         {
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                 "像素值",
-                ImgOpOneParamNumEnum.Sketch, ImageOperateMethods.Sketch,
-                "Int类型", "128"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                 "像素值",
-                ImgOpOneParamNumEnum.Emboss, ImageOperateMethods.Emboss,
-                "", "128"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<double>(
-                 "去雾因子",
-                ImgOpOneParamNumEnum.FastDehazing, ImageOperateMethods.FastDehazing,
-                "double类型", "0.85"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                 "邻域大小",
-                ImgOpOneParamNumEnum.GroundGlass, ImageOperateMethods.GroundGlass,
-                "int类型，奇数，大于3", "5"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                 "噪声点数",
-                ImgOpOneParamNumEnum.AddSaltNoise, ImageOperateMethods.AddSaltNosie,
-                "", "2500"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                "噪声点数",
-                ImgOpOneParamNumEnum.AddPepperNoise, ImageOperateMethods.AddPepperNoise,
-                "", "2500"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                "噪声点数",
-                ImgOpOneParamNumEnum.AddSaltPepperNoise, ImageOperateMethods.AddSaltPepperNoise,
-                "", "2500"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                "滤波器大小",
-                ImgOpOneParamNumEnum.Blur, ImageOperateMethods.Blur,
-                "int类型，奇数", "3"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                "滤波器大小",
-                ImgOpOneParamNumEnum.MedianBlur, ImageOperateMethods.MedianBlur,
-                "int类型，奇数", "3"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                "滤波器大小",
-                ImgOpOneParamNumEnum.BilateralFilter, ImageOperateMethods.BilateralFilter,
-                "int类型，奇数", "3"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                "滤波器大小",
-                ImgOpOneParamNumEnum.GaussianBlur, ImageOperateMethods.GaussianBlur,
-                "int类型，奇数", "3"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                "滤波器大小",
-                ImgOpOneParamNumEnum.BoxFilter, ImageOperateMethods.BoxFilter,
-                "int类型，奇数", "3"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                "采样次数",
-                ImgOpOneParamNumEnum.PyrUp, ImageOperateMethods.PyrUp,
-                "int类型，采样次数不易过大", "1"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(
-                "采样次数",
-                ImgOpOneParamNumEnum.PyrDown, ImageOperateMethods.PyrDown,
-                "int类型，采样次数不易过大", "1"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<double>(
-                "最小面积",
-                ImgOpOneParamNumEnum.BoundingRect, ImageOperateMethods.BoundingRect,
-                "double类型", "200.0"));
-            OperationsOneParamNum.Add(new ImgOperateOneParamNum<double>(
-                "最小面积",
-                ImgOpOneParamNumEnum.BoundingCircle, ImageOperateMethods.BoundingCircle,
-                "double类型", "200.0"));
+            List<MethodInfo> methods = GetMethodsWithAttribute<NumberParamAttribute>(typeof(ImageOperateMethods));
+            foreach (ImgOpOneParamNumEnum item in Enum.GetValues<ImgOpOneParamNumEnum>())
+            {
+                MethodInfo method = methods.FirstOrDefault(m => m.Name == item.ToString());
+                if (method == null)
+                    continue;
+                NumberParamAttribute attr = method.GetCustomAttribute<NumberParamAttribute>();
+                if (attr == null)
+                    continue;
+                if (attr.Paramtype == NumberParamTypeEnum.Integer)
+                {
+                    Func<Mat, int, Mat> func = (Func<Mat, int, Mat>)Delegate.CreateDelegate(typeof(Func<Mat, int, Mat>), method);
+                    OperationsOneParamNum.Add(new ImgOperateOneParamNum<int>(attr.DiaplayText, item, func, attr.TipText, attr.DefaultValue));
+                }
+                else if (attr.Paramtype == NumberParamTypeEnum.Double)
+                {
+                    Func<Mat, double, Mat> func = (Func<Mat, double, Mat>)Delegate.CreateDelegate(typeof(Func<Mat, double, Mat>), method);
+                    OperationsOneParamNum.Add(new ImgOperateOneParamNum<double>(attr.DiaplayText, item, func, attr.TipText, attr.DefaultValue));
+                }
+            }
         }
-
-        public ICommand OneParamNumOpCommand { get; }
 
         /// <summary>
         /// 图像处理 一个参数方法 数值类
         /// </summary>
         /// <param name="operation"></param>
+        [RelayCommand]
         private void ProcessImageOneParamNum(ImgOpOneParamNumEnum operation)
         {
             if (string.IsNullOrEmpty(_srcImagePath))
@@ -246,42 +155,35 @@ namespace ImageHandle.ViewModels
 
         private void InitImgOpOneParamEnum()
         {
-            OperationsOneParamEnum.Add(new ImgOperateOneParamEnum<FlipMode>(
-                 "方向",
-                ImgOpOneParamEnumEnum.Flip, ImageOperateMethods.Flip,
-                ""));
-            OperationsOneParamEnum.Add(new ImgOperateOneParamEnum<ColormapTypes>(
-                 "方式",
-                ImgOpOneParamEnumEnum.ApplyColorMap, ImageOperateMethods.ApplyColorMap,
-                ""));
-            OperationsOneParamEnum.Add(new ImgOperateOneParamEnum<EdegTypeEnum>(
-                "检测算法",
-                ImgOpOneParamEnumEnum.Edge, ImageOperateMethods.Edge,
-                ""));
-            OperationsOneParamEnum.Add(new ImgOperateOneParamEnum<ClassifierEnum>(
-                "分类器",
-                ImgOpOneParamEnumEnum.FeatureRecogn, ImageOperateMethods.FeatureRecogn,
-                ""));
-            OperationsOneParamEnum.Add(new ImgOperateOneParamEnum<SkinDefectEnum>(
-                "算法",
-                ImgOpOneParamEnumEnum.SkinDefect, ImageOperateMethods.SkinDefect,
-                ""));
-            OperationsOneParamEnum.Add(new ImgOperateOneParamEnum<SymmDirection>(
-                "方向",
-                ImgOpOneParamEnumEnum.CompleteSymm, ImageOperateMethods.CompleteSymm,
-                ""));
-            OperationsOneParamEnum.Add(new ImgOperateOneParamEnum<BGREnum>(
-                "通道",
-                ImgOpOneParamEnumEnum.BGRSingle, ImageOperateMethods.BGRSingle,
-                ""));
-        }
+            List<MethodInfo> methods = GetMethodsWithAttribute<EnumParamAttribute>(typeof(ImageOperateMethods));
+            foreach (ImgOpOneParamEnumEnum item in Enum.GetValues<ImgOpOneParamEnumEnum>())
+            {
+                MethodInfo method = methods.FirstOrDefault(m => m.Name == item.ToString());
+                if (method == null)
+                    continue;
+                EnumParamAttribute attr = method.GetCustomAttribute<EnumParamAttribute>();
+                if (attr == null)
+                    continue;
+                var paramters = method.GetParameters();
+                if (paramters.Length < 2)
+                    continue;
+                Type paramType = paramters[1].ParameterType;
+                if (!paramType.IsEnum)
+                    continue;
+                Type funcType = typeof(Func<,,>).MakeGenericType(typeof(Mat), paramType, typeof(Mat));
+                Delegate func = Delegate.CreateDelegate(funcType, null, method);
+                Type genericType = typeof(ImgOperateOneParamEnum<>).MakeGenericType(paramType);
+                object instance = Activator.CreateInstance(genericType, attr.DiaplayText, item, func, attr.TipText, attr.DefaultValue);
 
-        public ICommand OneParamEnumOpCommand { get; }
+                OperationsOneParamEnum.Add((ImgOpOneParamEnumBase)instance);
+            }
+        }
 
         /// <summary>
         /// 图像处理 一个参数方法 数值类
         /// </summary>
         /// <param name="operation"></param>
+        [RelayCommand]
         private void ProcessImageOneParamEnum(ImgOpOneParamEnumEnum operation)
         {
             if (string.IsNullOrEmpty(_srcImagePath))
@@ -310,6 +212,26 @@ namespace ImageHandle.ViewModels
         }
 
         #endregion 图像单操作 一个参数 枚举
+
+        public ObservableCollection<DataModel> DataCollection { get; } = new();
+
+        private List<MethodInfo> GetMethodsWithAttribute<TAttribute>(Type type) where TAttribute : Attribute
+        {
+            return type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                       .Where(m => m.GetCustomAttribute<TAttribute>() != null)
+                       .ToList();
+        }
+
+        public ImgOpOneParamEnumBase Create(MethodInfo method, object target, string labelText, ImgOpOneParamEnumEnum operationType, string toolTips = "", string defeatValue = "0")
+        {
+            var parameters = method.GetParameters();
+            Type enumType = parameters[1].ParameterType;
+            Type funcType = typeof(Func<,,>).MakeGenericType(typeof(Mat), enumType, typeof(Mat));
+            Delegate func = Delegate.CreateDelegate(funcType, target, method);
+            Type genericType = typeof(ImgOperateOneParamEnum<>).MakeGenericType(enumType);
+            object instance = Activator.CreateInstance(genericType, labelText, operationType, func, toolTips, defeatValue);
+            return (ImgOpOneParamEnumBase)instance;
+        }
     }
 
     #region 无其他参数
@@ -439,6 +361,7 @@ namespace ImageHandle.ViewModels
             InputParam = defeatValue;
             ParamToolText = toolTips;
             ItemsArray = Enum.GetNames(typeof(T));
+            EnumType = typeof(T);
             var attribute = func.Method
 .GetCustomAttributes(typeof(MethodCNNameAttribute), false)
 .OfType<MethodCNNameAttribute>()
@@ -472,4 +395,9 @@ namespace ImageHandle.ViewModels
     }
 
     #endregion 一个参数 枚举类型
+
+    public class DataModel
+    {
+        public Type EnumType { get; set; }
+    }
 }

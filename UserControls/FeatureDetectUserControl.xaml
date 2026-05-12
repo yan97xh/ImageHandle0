@@ -41,7 +41,7 @@
                                     Width="120"
                                     Style="{StaticResource ImgOperateBtnStyle}"
                                     Content="{Binding DisplayName}"
-                                    Command="{Binding DataContext.FeatureDetectCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    Command="{Binding DataContext.ProcessOperationsCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                     CommandParameter="{Binding operation}"
                                     ToolTip="{Binding Remark}" />
                                 <ItemsControl ItemsSource="{Binding ParamValueList}">
@@ -155,7 +155,7 @@
                     FontSize="20"
                     Style="{StaticResource ImgOperateBtnStyle}"
                     Content="角点提取"
-                    Command="{Binding FeatureDetectPointCommand}" />
+                    Command="{Binding ProcessFeatureDetectPointCommand}" />
             </StackPanel>
             <Border Margin="20,5" BorderBrush="#11aabd" BorderThickness="0,0,0,2" />
             <!--#endregion-->

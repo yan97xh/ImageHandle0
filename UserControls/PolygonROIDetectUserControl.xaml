@@ -64,25 +64,6 @@
                     Height="720"
                     Source="{Binding LastMat, Converter={StaticResource matToImageSource}, Mode=TwoWay}"
                     Stretch="Fill">
-                    <!--<i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDown">
-                            <i:InvokeCommandAction Command="{Binding MouseDownCommand}" />
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="MouseUp">
-                            <i:InvokeCommandAction Command="{Binding MouseUpCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>-->
-                    <!-- 鼠标事件处理 -->
-                    <!--
-     <Image.Style>
-         <Style TargetType="Image">
-             <Style.Triggers>
-                 <DataTrigger Binding="{Binding IsCoordinateModeEnabled}" Value="True">
-                     <Setter Property="Cursor" Value="Cross" />
-                 </DataTrigger>
-             </Style.Triggers>
-         </Style>
-     </Image.Style>-->
                 </Image>
                 <roi:PolygonROICanvas
                     Width="760"
@@ -109,7 +90,7 @@
                     <!-- 上下实现效果一样 -->
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding ROIColorCommand}" />
+                            <i:InvokeCommandAction Command="{Binding ProcessROIColorCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <!--#endregion-->
@@ -145,7 +126,7 @@
                     Margin="50,20"
                     Style="{StaticResource ImgOperateBtnStyle}"
                     Content="ROI抠图"
-                    Command="{Binding ROIDetectCommand}" />
+                    Command="{Binding PolygonROIDetectCommand}" />
                 <TextBlock Margin="20,0" Style="{StaticResource LabelText}" Text="抠图背景颜色:" />
                 <Border
                     Width="80"
@@ -159,14 +140,18 @@
                     <!-- 上下实现效果一样 -->
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding DetectBackColorCommand}" />
+                            <i:InvokeCommandAction Command="{Binding ProcessDetectBackColorCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <!--#endregion-->
                 </Border>
             </StackPanel>
             <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
-            <local:DstImgShowUserControl Margin="0,20" LabelText="保存图像" DstImageSource="{Binding ROIDetectMat, Mode=TwoWay}" />
+            <local:DstImgShowUserControl
+                Margin="0,20"
+                LabelText="保存图像"
+                DstImageSource="{Binding ROIDetectMat, Mode=TwoWay}"
+                ImageStretch="Uniform" />
         </StackPanel>
     </Grid>
 </UserControl>

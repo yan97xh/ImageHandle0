@@ -1,80 +1,37 @@
-﻿using ImageHandle.Commands;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ImageHandle.Commands;
 using Microsoft.Win32;
 using OpenCvSharp;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace ImageHandle.ViewModels
 {
-    public class ROIInsertViewModel : ViewModelBase
+    public partial class ROIInsertViewModel : ObservableObject
     {
         private readonly double defaultROIWidth = 100;
         private readonly double defaultROIHeight = 100;
 
         public ROIInsertViewModel()
         {
-            SelectSrcImgCommand = new RelayCommand(SelectSrcImg);
-
             _matCollection = new ObservableCollection<Mat>();
             _matCollection.CollectionChanged += OnCollectionChanged;
-
-            InitROICommand = new Command<System.Windows.Point>(InitROI);
-
-            ROIRectangleColorCommand = new Commands.RelayCommand(ProcessROIRectangleColor);
-            ClearROICommand = new Commands.RelayCommand(ClearROI);
-            SaveImageCommand = new RelayCommand(SaveImage);
-
-            SelectInsertImgCommand = new RelayCommand(SelectInsertImg);
-            RevocationCommand = new Commands.RelayCommand(ProcessRevocation);
-            RecoverCommand = new Commands.RelayCommand(Recover);
-
-            InserImageCommand = new Commands.RelayCommand(InsertImage);
         }
 
-        #region ROI
-
+        [ObservableProperty]
         private System.Windows.Point topLeftP;
 
-        public System.Windows.Point TopLeftP
-        {
-            get { return topLeftP; }
-            set
-            {
-                topLeftP = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private System.Windows.Point bottomRightP;
 
-        public System.Windows.Point BottomRightP
-        {
-            get { return bottomRightP; }
-            set
-            {
-                bottomRightP = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private bool isROIDetectEnabled = false;
 
-        public bool IsROIDetectEnabled
-        {
-            get { return isROIDetectEnabled; }
-            set
-            {
-                isROIDetectEnabled = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand InitROICommand { get; }
-
+        [RelayCommand]
         private void InitROI(System.Windows.Point center)
         {
             if (string.IsNullOrEmpty(SrcImgPath))
@@ -92,70 +49,28 @@ namespace ImageHandle.ViewModels
             BottomRightP = new System.Windows.Point(center.X + defaultROIWidth / 2, center.Y + defaultROIHeight / 2);
         }
 
-        public ICommand ClearROICommand { get; }
-
+        [RelayCommand]
         private void ClearROI()
         {
             IsROIDetectEnabled = false;
         }
 
-        #endregion ROI
-
-        #region 输入输出图像路径
-
+        [ObservableProperty]
         private string _srcImgPath;
 
-        public string SrcImgPath
-        {
-            get => _srcImgPath;
-            set
-            {
-                _srcImgPath = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private string _saveImagePath;
-
-        public string SaveImagePath
-        {
-            get => _saveImagePath;
-            set
-            {
-                _saveImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入输出图像路径
 
         #region 图像集合 用于保存每步操作 可撤销
 
         private ObservableCollection<Mat> _matCollection = new ObservableCollection<Mat>();
         public ObservableCollection<Mat> MatCollection => _matCollection;
+
+        [ObservableProperty]
         private Mat _lastMat;
 
-        public Mat LastMat
-        {
-            get => _lastMat;
-            set
-            {
-                _lastMat = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private Mat _insertMat;
-
-        public Mat InsertMat
-        {
-            get => _insertMat;
-            set
-            {
-                _insertMat = value;
-                OnPropertyChanged();
-            }
-        }
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -180,10 +95,7 @@ namespace ImageHandle.ViewModels
 
         #endregion 图像集合 用于保存每步操作 可撤销
 
-        #region 选择输入图像命令
-
-        public ICommand SelectSrcImgCommand { get; }
-
+        [RelayCommand]
         private void SelectSrcImg()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -202,12 +114,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择输入图像命令
-
-        #region 保存输出图像命令
-
-        public ICommand SaveImageCommand { get; }
-
+        [RelayCommand]
         private void SaveImage()
         {
             if (LastMat == null)
@@ -239,12 +146,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 保存输出图像命令
-
-        #region 选择插入图像命令
-
-        public ICommand SelectInsertImgCommand { get; }
-
+        [RelayCommand]
         private void SelectInsertImg()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -259,24 +161,10 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择插入图像命令
-
-        #region 选择颜色的命令
-
+        [ObservableProperty]
         private Brush _rOIRectangleColor = Brushes.Red;
 
-        public Brush ROIRectangleColor
-        {
-            get { return _rOIRectangleColor; }
-            set
-            {
-                _rOIRectangleColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public ICommand ROIRectangleColorCommand { get; }
-
+        [RelayCommand]
         private void ProcessROIRectangleColor()
         {
             var colorDialog = new System.Windows.Forms.ColorDialog();
@@ -293,24 +181,14 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择颜色的命令
-
-        #region 撤销命令
-
-        public ICommand RevocationCommand { get; }
-
+        [RelayCommand]
         private void ProcessRevocation()
         {
             Pop();
             IsROIDetectEnabled = false;
         }
 
-        #endregion 撤销命令
-
-        #region 复原命令
-
-        public ICommand RecoverCommand { get; }
-
+        [RelayCommand]
         private void Recover()
         {
             if (_matCollection.Count <= 0)
@@ -325,26 +203,12 @@ namespace ImageHandle.ViewModels
             IsROIDetectEnabled = false;
         }
 
-        #endregion 复原命令
-
-        #region 插入图像命令
-
         // 显示控件上的图像展示尺寸（由视图层设置：通常是 Image 或 ROICanvas 的实际显示尺寸）
+        [ObservableProperty]
         private double _imageDisplayWidth;
 
-        public double ImageDisplayWidth
-        {
-            get => _imageDisplayWidth;
-            set { _imageDisplayWidth = value; OnPropertyChanged(); }
-        }
-
+        [ObservableProperty]
         private double _imageDisplayHeight;
-
-        public double ImageDisplayHeight
-        {
-            get => _imageDisplayHeight;
-            set { _imageDisplayHeight = value; OnPropertyChanged(); }
-        }
 
         private OpenCvSharp.Rect? GetImageRect()
         {
@@ -392,8 +256,7 @@ namespace ImageHandle.ViewModels
             return new OpenCvSharp.Rect(x, y, width, height);
         }
 
-        public ICommand InserImageCommand { get; }
-
+        [RelayCommand]
         private void InsertImage()
         {
             if (LastMat == null)
@@ -428,7 +291,5 @@ namespace ImageHandle.ViewModels
             Push(resultMat);
             IsROIDetectEnabled = false;
         }
-
-        #endregion 插入图像命令
     }
 }

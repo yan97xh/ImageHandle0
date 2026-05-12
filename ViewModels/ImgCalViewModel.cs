@@ -1,4 +1,6 @@
-﻿using ImageHandle.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ImageHandle.Helpers;
 using ImageHandle.Models;
 using OpenCvSharp;
 using System.Collections.ObjectModel;
@@ -11,105 +13,33 @@ namespace ImageHandle.ViewModels
     /// <summary>
     /// 图像计算类的 vm
     /// </summary>
-    public class ImgCalViewModel : ViewModelBase
+    public partial class ImgCalViewModel : ObservableObject
     {
         public ImgCalViewModel()
         {
-            ImageArr = Enum.GetNames(typeof(MatOpName));
-
-            // 两张图
-            TwoMatOpCommand = new Commands.Command<ImgCalOpTowMatEnum>(ProcessImageTwoMat);
-            InitImgOpTwoMat();
-
-            // 第一张图
-            OneMatOpCommand1 = new Commands.Command<ImgCalOpOneMatEnum>(ProcessImageOneMat1);
-            InitImgOpOneMat1();
-
-            // 第二张图
-            OneMatOpCommand2 = new Commands.Command<ImgCalOpOneMatEnum>(ProcessImageOneMat2);
-            InitImgOpOneMat2();
-
-            //图像相似度比较
-            SimilarityCommand = new Commands.Command<MatSimilarityEnum>(ProcessSimilarityOperation);
-            InitSimilarityOperations();
-
-            //图像拼接
-            TwoMatOneEnumCommand = new Commands.Command<TwoMatOpEnum>(ProcessConcatOperation);
-            InitTwoMatOneEnumOps();
+            InitImgOpTwoMat();   // 两张图
+            InitImgOpOneMat1();  // 第一张图
+            InitImgOpOneMat2();   // 第二张图
+            InitSimilarityOperations(); //图像相似度比较
+            InitTwoMatOneEnumOps(); //图像拼接
         }
 
-        #region 输入图像
+        [ObservableProperty]
+        private string _srcImagePath1; // 输入图像1
 
-        private string _srcImagePath1;
+        [ObservableProperty]
+        private string _srcImagePath2; // 输入图像2
 
-        public string SrcImagePath1
-        {
-            get => _srcImagePath1;
-            set
-            {
-                _srcImagePath1 = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private string _srcImagePath2;
-
-        public string SrcImagePath2
-        {
-            get => _srcImagePath2;
-            set
-            {
-                _srcImagePath2 = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入图像
-
-        #region 输出图像
-
-        private Mat _dstMat;
-
-        public Mat DstMat
-        {
-            get => _dstMat;
-            set
-            {
-                _dstMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输出图像
+        [ObservableProperty]
+        private Mat _dstMat; // 输出图像
 
         #region 两张图像算数运算
 
-        private bool _setSameSizeType;
+        [ObservableProperty]
+        private bool _setSameSizeType;//是否强制转换大小类型,两张图在做计算的时候 需要大小和类型一样
 
-        //是否强制转换大小类型 ， 两张图在做计算的时候 需要大小和类型一样
-        public bool SetSameSizeType
-        {
-            get { return _setSameSizeType; }
-            set
-            {
-                _setSameSizeType = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string[] ImageArr
-        {
-            get;
-        }
-
-        private string _dstImageSizeType;
-
-        // 转换的目标图像  1 还是 2  ,最后的大小
-        public string DstImageSizeType
-        {
-            get { return _dstImageSizeType; }
-            set { _dstImageSizeType = value; OnPropertyChanged(); }
-        }
+        [ObservableProperty]
+        private string _dstImageSizeType;  // 转换的目标图像  1 还是 2  ,最后的大小
 
         /// <summary>
         /// 图像操作集合 一个参数 数值类
@@ -175,12 +105,11 @@ namespace ImageHandle.ViewModels
             });
         }
 
-        public ICommand TwoMatOpCommand { get; }
-
         /// <summary>
         /// 图像处理 一个参数方法 数值类
         /// </summary>
         /// <param name="operation"></param>
+        [RelayCommand]
         private void ProcessImageTwoMat(ImgCalOpTowMatEnum operation)
         {
             if (string.IsNullOrEmpty(_srcImagePath1))
@@ -362,8 +291,7 @@ namespace ImageHandle.ViewModels
             });
         }
 
-        public ICommand OneMatOpCommand1 { get; }
-
+        [RelayCommand]
         private void ProcessImageOneMat1(ImgCalOpOneMatEnum operation)
         {
             if (string.IsNullOrEmpty(_srcImagePath1))
@@ -472,8 +400,7 @@ namespace ImageHandle.ViewModels
             });
         }
 
-        public ICommand OneMatOpCommand2 { get; }
-
+        [RelayCommand]
         private void ProcessImageOneMat2(ImgCalOpOneMatEnum operation)
         {
             if (string.IsNullOrEmpty(_srcImagePath2))
@@ -537,17 +464,8 @@ namespace ImageHandle.ViewModels
 
         #region 图像相似度比较
 
+        [ObservableProperty]
         private double _similarity;
-
-        public double Similarity
-        {
-            get { return _similarity; }
-            set
-            {
-                _similarity = value;
-                OnPropertyChanged();
-            }
-        }
 
         public ObservableCollection<ImgSimilarityOperation> SimilarityOperations { get; } = new();
 
@@ -560,8 +478,7 @@ namespace ImageHandle.ViewModels
             SimilarityOperations.Add(new ImgSimilarityOperation("PSNR", MatSimilarityEnum.PSNR, ImageOperateMethods.PSNR, "峰值信噪比"));
         }
 
-        public ICommand SimilarityCommand { get; }
-
+        [RelayCommand]
         private void ProcessSimilarityOperation(MatSimilarityEnum similarityEnum)
         {
             if (string.IsNullOrEmpty(_srcImagePath1))
@@ -640,8 +557,7 @@ namespace ImageHandle.ViewModels
             TwoMatOneEnumOps.Add(new TwoMatOpEnumClass<ConcatEnum>("图像拼接", "拼接方式", TwoMatOpEnum.Concat, ImageOperateMethods.Concat));
         }
 
-        public ICommand TwoMatOneEnumCommand { get; }
-
+        [RelayCommand]
         private void ProcessConcatOperation(TwoMatOpEnum operation)
         {
             if (string.IsNullOrEmpty(_srcImagePath1))

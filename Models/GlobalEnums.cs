@@ -477,4 +477,10 @@ namespace ImageHandle.Models
         LinerPolar,
         LogPolar,
     }
+
+    public enum NumberParamTypeEnum
+    {
+        Integer,
+        Double,
+    }
 }

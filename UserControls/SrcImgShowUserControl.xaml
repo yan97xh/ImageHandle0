@@ -5,6 +5,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:ImageHandle.UserControls"
+    xmlns:behavior="clr-namespace:ImageHandle.Behaviors"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     Width="400"
     Height="410"
     d:DesignHeight="400"
@@ -30,6 +32,51 @@
             Height="335"
             Source="{Binding SrcImageSource, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
             Stretch="Uniform" />
+        <Grid Grid.Row="1" Background="Transparent" AllowDrop="True">
+            <b:Interaction.Triggers>
+                <b:EventTrigger EventName="DragEnter">
+                    <b:ChangePropertyAction TargetObject="{Binding ElementName=dropImagePanel}" PropertyName="Visibility" Value="Visible" />
+                </b:EventTrigger>
+                <b:EventTrigger EventName="DragLeave">
+                    <b:ChangePropertyAction TargetObject="{Binding ElementName=dropImagePanel}" PropertyName="Visibility" Value="Hidden" />
+                </b:EventTrigger>
+                <b:EventTrigger EventName="Drop">
+                    <b:ChangePropertyAction TargetObject="{Binding ElementName=dropImagePanel}" PropertyName="Visibility" Value="Hidden" />
+                </b:EventTrigger>
+            </b:Interaction.Triggers>
+            <Grid
+                x:Name="dropImagePanel"
+                Width="200"
+                Height="100"
+                Visibility="Hidden">
+                <b:Interaction.Behaviors>
+                    <behavior:DropImageBehavior ImageName="{Binding SrcImageSource, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=OneWayToSource}" />
+                </b:Interaction.Behaviors>
+                <b:Interaction.Triggers>
+                    <b:EventTrigger EventName="Drop">
+                        <b:ChangePropertyAction TargetObject="{Binding ElementName=dropImagePanel}" PropertyName="Visibility" Value="Hidden" />
+                    </b:EventTrigger>
+                </b:Interaction.Triggers>
+                <Border
+                    Width="200"
+                    Height="100"
+                    Background="White"
+                    Opacity="0.75" />
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="将图像拖动到此处"
+                    FontSize="16" />
+                <Rectangle
+                    Width="200"
+                    Height="100"
+                    Stroke="Gray"
+                    StrokeThickness="2"
+                    RadiusX="10"
+                    RadiusY="10"
+                    StrokeDashArray="2,3" />
+            </Grid>
+        </Grid>
         <StackPanel
             Grid.Row="2"
             Margin="0,0,0,2"

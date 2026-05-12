@@ -35,8 +35,8 @@ namespace ImageHandle.Scripts
 
         private bool _isMouseDown;
         private bool _isDragging;
-        private Point _mouseDownPos; // 相对于父 Canvas 的位置（用于判断阈值）
-        private Point _dragOffset;   // 鼠标相对于控件左上角的偏移（用于保持抓取点）
+        private Point _mouseDownPos;   // 相对于父 Canvas 的位置（用于判断阈值）
+        private Point _dragOffset;     // 鼠标相对于控件左上角的偏移（用于保持抓取点）
         private Point _lastAllowedPos; // 最近一次允许的位置（用于防止重叠回退）
         private const double OverlapPadding = 4.0;
 
@@ -53,7 +53,8 @@ namespace ImageHandle.Scripts
 
         // Using a DependencyProperty as the backing store for LabelText.
         public static readonly DependencyProperty LabelTextProperty =
-            DependencyProperty.Register("LabelText", typeof(string), typeof(ScriptUserControl), new PropertyMetadata(""));
+            DependencyProperty.Register("LabelText", typeof(string), typeof(ScriptUserControl),
+                                        new PropertyMetadata(""));
 
         // 连接点点击处理（绑定在 XAML 上）
         private void Connector_MouseDown(object sender, MouseButtonEventArgs e)
@@ -61,15 +62,15 @@ namespace ImageHandle.Scripts
             // 阻止冒泡到 UserControl 的拖动逻辑
             e.Handled = true;
 
-            var canvas = FindAncestor<Canvas>(this);
+            Canvas? canvas = FindAncestor<Canvas>(this);
             if (canvas == null) return;
 
             if (sender is not FrameworkElement ellipse) return;
 
             // 计算点击点在 Canvas 中的位置（圆心）
-            var center = new Point(ellipse.ActualWidth / 2, ellipse.ActualHeight / 2);
+            System.Windows.Point center = new Point(ellipse.ActualWidth / 2, ellipse.ActualHeight / 2);
             // 如果 TransformToAncestor 抛异常需保证 visual tree 已连接；此处假设控件已加入 Canvas
-            var posInCanvas = ellipse.TransformToAncestor(canvas).Transform(center);
+            System.Windows.Point posInCanvas = ellipse.TransformToAncestor(canvas).Transform(center);
 
             string connectorName = ellipse.Name ?? "Unknown";
             ConnectorClicked?.Invoke(this, new ConnectorClickedEventArgs(posInCanvas, connectorName, this));
@@ -83,7 +84,7 @@ namespace ImageHandle.Scripts
                 _isMouseDown = true;
                 _isDragging = false;
 
-                var canvas = FindAncestor<Canvas>(this);
+                Canvas? canvas = FindAncestor<Canvas>(this);
                 if (canvas != null)
                 {
                     _mouseDownPos = e.GetPosition(canvas);
@@ -104,20 +105,21 @@ namespace ImageHandle.Scripts
         {
             if (!_isMouseDown || Mouse.Captured != sender) return;
 
-            var canvas = FindAncestor<Canvas>(this);
+            Canvas? canvas = FindAncestor<Canvas>(this);
             if (canvas == null) return;
 
-            var pos = e.GetPosition(canvas);
+            System.Windows.Point pos = e.GetPosition(canvas);
 
             if (!_isDragging)
             {
-                var dx = Math.Abs(pos.X - _mouseDownPos.X);
-                var dy = Math.Abs(pos.Y - _mouseDownPos.Y);
+                double dx = Math.Abs(pos.X - _mouseDownPos.X);
+                double dy = Math.Abs(pos.Y - _mouseDownPos.Y);
                 if (dx <= SystemParameters.MinimumHorizontalDragDistance &&
                     dy <= SystemParameters.MinimumVerticalDragDistance)
                 {
                     return;
                 }
+
                 _isDragging = true;
             }
 
@@ -183,6 +185,7 @@ namespace ImageHandle.Scripts
             {
                 Mouse.Capture(null);
             }
+
             _isMouseDown = false;
             _isDragging = false;
 
@@ -237,6 +240,7 @@ namespace ImageHandle.Scripts
             {
                 parent = VisualTreeHelper.GetParent(parent);
             }
+
             return parent as T;
         }
     }

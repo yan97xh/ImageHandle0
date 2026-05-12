@@ -10,6 +10,9 @@
     xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
     xmlns:be="clr-namespace:ImageHandle.Behaviors"
     xmlns:rule="clr-namespace:ImageHandle.ValidationRules"
+    xmlns:ex="clr-namespace:ImageHandle.Extensions"
+    xmlns:models="clr-namespace:ImageHandle.Models"
+    xmlns:opencv="clr-namespace:OpenCvSharp;assembly=OpenCvSharp"
     Width="1450"
     Height="840"
     d:DesignHeight="840"
@@ -64,7 +67,7 @@
                     <!-- 上下实现效果一样 -->
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding FontColorCommand}" />
+                            <i:InvokeCommandAction Command="{Binding ProcessFontColorCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <!--#endregion-->
@@ -80,7 +83,7 @@
                     Background="#495660"
                     Foreground="White">
                     <TextBox.Text>
-                        <Binding Path="FontScale">
+                        <Binding Path="WriteFontScale">
                             <Binding.ValidationRules>
                                 <rule:DoubleValidationRule />
                             </Binding.ValidationRules>
@@ -135,7 +138,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     IsEditable="False"
-                    ItemsSource="{Binding FontStyleItemsArray}"
+                    ItemsSource="{ex:EnumBindingSource EnumType=opencv:HersheyFonts}"
                     SelectedIndex="0"
                     Style="{StaticResource ParameterizedComboBoxStyle}"
                     Background="#495660"
@@ -157,7 +160,7 @@
                     Background="#495660"
                     BorderBrush="White"
                     Foreground="White"
-                    Text="{Binding Thinckness, UpdateSourceTrigger=PropertyChanged}">
+                    Text="{Binding WriteTextThinckness, UpdateSourceTrigger=PropertyChanged}">
                 </ComboBox>
                 <TextBlock Style="{StaticResource LabelText}" Text="字体预览图:" />
                 <Image
@@ -177,13 +180,13 @@
                     FontSize="20"
                     Background="#495660"
                     Foreground="White"
-                    Text="{Binding Text}" />
+                    Text="{Binding WriteText}" />
                 <Button
                     Margin="50,0,0,0"
                     Style="{StaticResource ImgOperateBtnStyle}"
                     Content="文本写入"
                     ToolTip="不支持写入中文!!!"
-                    Command="{Binding WriteTextCommand}" />
+                    Command="{Binding ProcessWriteTextCommand}" />
             </StackPanel>
             <!--#endregion-->
             <Border BorderThickness="0,0,0,1" BorderBrush="#11aabd" />
@@ -193,7 +196,7 @@
                     HorizontalAlignment="Center"
                     Style="{StaticResource ImgOperateBtnStyle}"
                     Content="文本识别"
-                    Command="{Binding OCRCommand}" />
+                    Command="{Binding ProcessOCRCommand}" />
             </StackPanel>
             <Border BorderThickness="0,0,0,1" BorderBrush="#11aabd" />
             <StackPanel Height="80" Orientation="Horizontal">
@@ -224,7 +227,7 @@
                     <!-- 上下实现效果一样 -->
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding QRCodeColorCommand}" />
+                            <i:InvokeCommandAction Command="{Binding ProcessQRCodeColorCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <!--#endregion-->

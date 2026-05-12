@@ -17,7 +17,7 @@ namespace ImageHandle.ROI
     public class PolygonROICanvas : Canvas
     {
         private readonly int _minDistance = 10; // 两顶点间的最小距离
-        private readonly int _minGap = 5; // 顶点与边界的最小距离
+        private readonly int _minGap = 5;       // 顶点与边界的最小距离
 
         private Point lastPoint;
         private readonly PolygonROIDrawingVisual roi;
@@ -50,8 +50,8 @@ namespace ImageHandle.ROI
         // Using a DependencyProperty as the backing store for Enable.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty EnableDrawProperty =
             DependencyProperty.Register("EnableDraw",
-                typeof(bool), typeof(PolygonROICanvas),
-                new PropertyMetadata(false, OnEnableDrawPropertyChanged));
+                                        typeof(bool), typeof(PolygonROICanvas),
+                                        new PropertyMetadata(false, OnEnableDrawPropertyChanged));
 
         private static void OnEnableDrawPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -61,6 +61,7 @@ namespace ImageHandle.ROI
             {
                 return;
             }
+
             if (e.NewValue is bool enable && enable == true)
             {
                 canvas.operate = PolygonROIOperateType.ReadyToDraw;
@@ -69,12 +70,12 @@ namespace ImageHandle.ROI
         }
 
         public static readonly DependencyProperty PointCollectionProperty =
-           DependencyProperty.Register(
-               nameof(PointCollection),
-               typeof(ObservableCollection<Point>),
-               typeof(PolygonROICanvas),
-               new PropertyMetadata(null,
-                  OnItemsPropertyChanged));
+            DependencyProperty.Register(
+                                        nameof(PointCollection),
+                                        typeof(ObservableCollection<Point>),
+                                        typeof(PolygonROICanvas),
+                                        new PropertyMetadata(null,
+                                                             OnItemsPropertyChanged));
 
         public ObservableCollection<Point> PointCollection
         {
@@ -110,8 +111,9 @@ namespace ImageHandle.ROI
         // Using a DependencyProperty as the backing store for RecantangleBrush.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty PolygonROIBrushProperty =
             DependencyProperty.Register("PolygonROIBrush", typeof(Brush), typeof(PolygonROICanvas),
-                new FrameworkPropertyMetadata(null,
-                new PropertyChangedCallback(OnRecantangleBrushPropertyChanged)));
+                                        new FrameworkPropertyMetadata(null,
+                                                                      new
+                                                                          PropertyChangedCallback(OnRecantangleBrushPropertyChanged)));
 
         private static void OnRecantangleBrushPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -151,14 +153,15 @@ namespace ImageHandle.ROI
             Point point = e.GetPosition(this);
             if (operate == PolygonROIOperateType.ReadyToDraw)
             {
-                List<Point> tempList = PointCollection?.ToList();
-                if (tempList == null || tempList.Count == 0)
+                List<Point> tempROIPointList = PointCollection?.ToList();
+                if (tempROIPointList == null || tempROIPointList.Count == 0)
                 {
                     return;
                 }
-                tempList.Add(point);
-                tempList = SortPointsForClosedPolygon(tempList);
-                roi.Draw(tempList, PolygonROIBrush);
+
+                tempROIPointList.Add(point);
+                tempROIPointList = SortPointsForClosedPolygon(tempROIPointList);
+                roi.Draw(tempROIPointList, PolygonROIBrush);
             }
             else if (operate == PolygonROIOperateType.DrawDone)
             {
@@ -178,6 +181,7 @@ namespace ImageHandle.ROI
                         {
                             x = this.ActualWidth - _minGap;
                         }
+
                         if (y < _minGap)
                         {
                             y = _minGap;
@@ -186,10 +190,12 @@ namespace ImageHandle.ROI
                         {
                             y = this.ActualHeight - _minGap;
                         }
+
                         // 移动点
                         PointCollection[res.Item1] = new Point(x, y);
                         //对集合进行重新排序，保证多边形闭合且不自交
-                        PointCollection = new ObservableCollection<Point>(SortPointsForClosedPolygon(PointCollection?.ToList()));
+                        PointCollection =
+                            new ObservableCollection<Point>(SortPointsForClosedPolygon(PointCollection?.ToList()));
                         roi.Draw(PointCollection?.ToList(), PolygonROIBrush);
                     }
                 }
@@ -237,7 +243,11 @@ namespace ImageHandle.ROI
                         }
 
                         PointCollection = new ObservableCollection<Point>(
-                            PointCollection.Select(point => new Point(point.X + finalXStep, point.Y + finalYStep)));
+                                                                          PointCollection.Select(point =>
+                                                                              new Point(point.X +
+                                                                                      finalXStep,
+                                                                                  point.Y +
+                                                                                  finalYStep)));
                         roi.Draw(PointCollection?.ToList(), PolygonROIBrush);
                     }
                 }
@@ -246,6 +256,7 @@ namespace ImageHandle.ROI
                     this.Cursor = Cursors.Arrow;
                 }
             }
+
             lastPoint = point;
         }
 
@@ -296,19 +307,23 @@ namespace ImageHandle.ROI
                     {
                         return;
                     }
+
                     if (point.Y < 0 || point.Y > this.ActualHeight)
                     {
                         return;
                     }
+
                     if (IsPointTooClose(point, PointCollection?.ToList()))
                     {
                         return;
                     }
+
                     // 单击增加点
                     PointCollection.Add(point);
                     lastPoint = e.GetPosition(this);
                 }
             }
+
             _lastClickTime = DateTime.Now;
         }
 
@@ -319,11 +334,13 @@ namespace ImageHandle.ROI
             {
                 return false;
             }
+
             foreach (var point in existingPoints)
             {
                 if (GetDistance(newPoint, point) < _minDistance)
                     return true;
             }
+
             return false;
         }
 
@@ -420,6 +437,7 @@ namespace ImageHandle.ROI
                 sumX += point.X;
                 sumY += point.Y;
             }
+
             return new Point(sumX / points.Count, sumY / points.Count);
         }
     }

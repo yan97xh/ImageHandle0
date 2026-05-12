@@ -10,6 +10,8 @@
     xmlns:cvert="clr-namespace:ImageHandle.Converters"
     xmlns:roi="clr-namespace:ImageHandle.ROI"
     xmlns:rule="clr-namespace:ImageHandle.ValidationRules"
+    xmlns:opencv="clr-namespace:OpenCvSharp;assembly=OpenCvSharp"
+    xmlns:ex="clr-namespace:ImageHandle.Extensions"
     Width="1450"
     Height="840"
     d:DesignHeight="840"
@@ -25,6 +27,7 @@
             <Setter Property="Foreground" Value="White" />
             <Setter Property="FontSize" Value="20" />
         </Style>
+        <ex:EnumBindingSource x:Key="tempMatchModeSource" EnumType="{x:Type opencv:TemplateMatchModes}" />
     </UserControl.Resources>
     <UserControl.DataContext>
         <vm:TemplateMatchViewModel />
@@ -122,6 +125,7 @@
             <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
             <StackPanel Margin="20" Orientation="Horizontal">
                 <TextBlock Margin="20,0,40,0" Style="{StaticResource LabelText}" Text="匹配方法:" />
+                <!-- ItemsSource="{Binding TemplateMatchModeArray}" -->
                 <ComboBox
                     Width="150"
                     Height="30"
@@ -129,7 +133,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     IsEditable="False"
-                    ItemsSource="{Binding TemplateMatchModeArray}"
+                    ItemsSource="{ex:EnumBindingSource EnumType=opencv:TemplateMatchModes}"
                     SelectedIndex="0"
                     Style="{StaticResource ParameterizedComboBoxStyle}"
                     Background="#495660"
@@ -166,21 +170,21 @@
                     Height="40"
                     Style="{StaticResource ImgOperateBtnStyle}"
                     Content="单模版匹配"
-                    Command="{Binding TemplateMatchSingle}" />
+                    Command="{Binding ProcessTemplateMatchSingleCommand}" />
                 <Button
                     Width="150"
                     Height="40"
                     Margin="20,0"
                     Style="{StaticResource ImgOperateBtnStyle}"
                     Content="多模版匹配"
-                    Command="{Binding TemplateMatchMultiCommand}" />
+                    Command="{Binding ProcessTemplateMatchMultiCommand}" />
                 <Button
                     Width="150"
                     Height="40"
                     Margin="20,0"
                     Style="{StaticResource ImgOperateBtnStyle}"
                     Content="角度模版匹配"
-                    Command="{Binding TemplateMatchCircleCommand}" />
+                    Command="{Binding ProcessTemplateMatchCircleCommand}" />
             </StackPanel>
             <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
         </StackPanel>

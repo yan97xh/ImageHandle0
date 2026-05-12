@@ -1,4 +1,6 @@
-﻿using ImageHandle.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ImageHandle.Models;
 using Microsoft.Win32;
 using OpenCvSharp;
 using System.Windows;
@@ -6,70 +8,25 @@ using System.Windows.Input;
 
 namespace ImageHandle.ViewModels
 {
-    public class MosaicViewModel : ViewModelBase
+    public partial class MosaicViewModel : ObservableObject
     {
         public MosaicViewModel()
         {
-            SelectSrcImgCommand = new Commands.RelayCommand(SelectSrcImg);
-            SaveImageCommand = new Commands.RelayCommand(SaveImage);
             MosaicSizeItemsArray = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
-
-            MouseDownCommand = new Commands.RelayCommand(ProcessMouseDown);
-            MouseUpCommand = new Commands.RelayCommand(ProcessMouseUp);
-            RecoverCommand = new Commands.RelayCommand(Recover);
-            MouseMoveCommand = new Commands.Command<System.Windows.Controls.Image>(ProcessMouseMove);
         }
 
-        #region 输入输出图像路径
-
+        [ObservableProperty]
         private string _srcImgPath;
 
-        public string SrcImgPath
-        {
-            get => _srcImgPath;
-            set
-            {
-                _srcImgPath = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private string _saveImagePath;
-
-        public string SaveImagePath
-        {
-            get => _saveImagePath;
-            set
-            {
-                _saveImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入输出图像路径
-
-        #region 图像
 
         private Mat _srcOriMat = null;
 
+        [ObservableProperty]
         private Mat _mainMat;
 
-        public Mat MainMat
-        {
-            get => _mainMat;
-            set
-            {
-                _mainMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 图像
-
-        #region 选择输入图像命令
-
-        public ICommand SelectSrcImgCommand { get; }
-
+        [RelayCommand]
         private void SelectSrcImg()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -88,12 +45,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择输入图像命令
-
-        #region 保存输出图像命令
-
-        public ICommand SaveImageCommand { get; }
-
+        [RelayCommand]
         private void SaveImage()
         {
             if (MainMat == null)
@@ -125,38 +77,15 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 保存输出图像命令
-
-        #region 马赛克大小
-
+        [ObservableProperty]
         private int _mosaicSize = 2;
-
-        public int MosaicSize
-        {
-            get => _mosaicSize;
-            set
-            {
-                _mosaicSize = value;
-                OnPropertyChanged();
-            }
-        }
 
         public int[] MosaicSizeItemsArray { get; }
 
-        #endregion 马赛克大小
-
+        [ObservableProperty]
         private bool _isMosaicEnabled = false;
-        private CoordinateModel _currentCoordinate = new CoordinateModel();
 
-        public bool IsMosaicEnabled
-        {
-            get => _isMosaicEnabled;
-            set
-            {
-                _isMosaicEnabled = value;
-                OnPropertyChanged();
-            }
-        }
+        private CoordinateModel _currentCoordinate = new CoordinateModel();
 
         public CoordinateModel CurrentCoordinate
         {
@@ -171,11 +100,7 @@ namespace ImageHandle.ViewModels
         private bool _isStartMosaic = false;
         private bool[,] mosaicFlagArray = null;
 
-        public ICommand MouseDownCommand { get; }
-        public ICommand MouseUpCommand { get; }
-
-        public ICommand MouseMoveCommand { get; }
-
+        [RelayCommand]
         private void ProcessMouseDown()
         {
             if (MainMat == null)
@@ -185,6 +110,7 @@ namespace ImageHandle.ViewModels
             _isStartMosaic = true;
         }
 
+        [RelayCommand]
         private void ProcessMouseUp()
         {
             _isStartMosaic = false;
@@ -214,6 +140,7 @@ namespace ImageHandle.ViewModels
             return new System.Windows.Point(imageX, imageY);
         }
 
+        [RelayCommand]
         private void ProcessMouseMove(System.Windows.Controls.Image image)
         {
             if (!_isStartMosaic || MainMat == null || mosaicFlagArray == null) return;
@@ -254,10 +181,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #region 复原命令
-
-        public ICommand RecoverCommand { get; }
-
+        [RelayCommand]
         private void Recover()
         {
             if (_srcOriMat == null)
@@ -272,7 +196,5 @@ namespace ImageHandle.ViewModels
             CurrentCoordinate.X = 0;
             CurrentCoordinate.Y = 0;
         }
-
-        #endregion 复原命令
     }
 }

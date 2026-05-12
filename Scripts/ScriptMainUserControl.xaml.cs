@@ -1,4 +1,5 @@
-﻿using ImageHandle.Helpers;
+﻿using ImageHandle.Attributes;
+using ImageHandle.Helpers;
 using OpenCvSharp;
 using System.IO;
 using System.Reflection;
@@ -14,6 +15,7 @@ namespace ImageHandle.Scripts
     /// <summary>
     /// ScriptMainUserControl.xaml 的交互逻辑
     /// </summary>
+    [NavigationPage(Models.PageEnum.ScriptPage)]
     public partial class ScriptMainUserControl : UserControl
     {
         private ScriptViewModel _viewModel;
@@ -24,11 +26,15 @@ namespace ImageHandle.Scripts
         private System.Windows.Point _startPoint; // 起始点在 Canvas 中的坐标
         private Polyline? _tempPolyline; // 用来绘制选中起始点还未选择结束点时的临时折线
 
+        private readonly SolidColorBrush _tempPolylineBrush = new SolidColorBrush(Colors.Red);
+        private readonly SolidColorBrush _polylineBrush = new SolidColorBrush(Colors.Lime);
+
         // 存储最终连接关系（用于拖动时实时更新）
-        private readonly List<Connection> _connections = new();
+        private readonly List<Connection> _connections = new List<Connection>();
 
         // 存储每个控件对应的方法参数列表
-        private Dictionary<ScriptUserControl, List<ScriptParamModel>> _controlParamDic = new Dictionary<ScriptUserControl, List<ScriptParamModel>>();
+        private Dictionary<ScriptUserControl, List<ScriptParamModel>> _controlParamDic =
+            new Dictionary<ScriptUserControl, List<ScriptParamModel>>();
 
         public ScriptMainUserControl()
         {
@@ -95,11 +101,13 @@ namespace ImageHandle.Scripts
                     hitObject = VisualTreeHelper.GetParent(hitObject);
                 }
 
-                if (hitObject is ScriptUserControl clickedRect)// 右键点击控件
+                if (hitObject is ScriptUserControl clickedRect) // 右键点击控件
                 {
-                    ContextMenu contextMenu = new ContextMenu();
-                    // Style 设置为全局自定义的ContextMenu样式
-                    contextMenu.Style = (Style)FindResource("ModernContextMenuStyle");
+                    ContextMenu contextMenu = new ContextMenu()
+                    {
+                        // Style 设置为全局自定义的ContextMenu样式
+                        Style = (Style)FindResource("ModernContextMenuStyle")
+                    };
                     MenuItem paramItem = new MenuItem
                     {
                         Header = "参数",
@@ -118,16 +126,20 @@ namespace ImageHandle.Scripts
                     contextMenu.IsOpen = true;
                     // 清理事件订阅 避免内存泄漏
                     contextMenu.Closed += (s, e) =>
-                    {
-                        paramItem.Click -= ParamItem_Click;
-                        deleteItem.Click -= DeleteItem_Click;
-                        contextMenu.Items.Clear();
-                    };
+                                          {
+                                              paramItem.Click -= ParamItem_Click;
+                                              deleteItem.Click -= DeleteItem_Click;
+                                              contextMenu.Items.Clear();
+                                          };
                     e.Handled = true;
                 }
                 else if (hitObject is Polyline polyline) // 右键点击折线
                 {
-                    ContextMenu contextMenu = new ContextMenu();
+                    ContextMenu contextMenu = new ContextMenu()
+                    {
+                        // Style 设置为全局自定义的ContextMenu样式
+                        Style = (Style)FindResource("ModernContextMenuStyle")
+                    };
                     MenuItem deletePolylineItem = new MenuItem
                     {
                         Header = "删除",
@@ -138,10 +150,10 @@ namespace ImageHandle.Scripts
                     contextMenu.Items.Add(deletePolylineItem);
                     contextMenu.IsOpen = true;
                     contextMenu.Closed += (s, e) =>
-                    {
-                        deletePolylineItem.Click -= DeletePolyline;
-                        contextMenu.Items.Clear();
-                    };
+                                          {
+                                              deletePolylineItem.Click -= DeletePolyline;
+                                              contextMenu.Items.Clear();
+                                          };
                     e.Handled = true;
                 }
             }
@@ -149,86 +161,98 @@ namespace ImageHandle.Scripts
 
         private void DeletePolyline(object sender, RoutedEventArgs e)
         {
-            if (sender is MenuItem menuItem && menuItem.Tag is Polyline polyline)
+            if (sender is not MenuItem menuItem || menuItem.Tag is not Polyline polyline)
             {
-                // 找出对应的连接关系
-                var conn = _connections.FirstOrDefault(x => x.Line == polyline);
-                if (conn != null)
-                {
-                    // 移除折线和箭头
-                    if (conn.Line != null && ScriptCanvas.Children.Contains(conn.Line))
-                    {
-                        ScriptCanvas.Children.Remove(conn.Line);
-                    }
-                    if (conn.Arrow != null && ScriptCanvas.Children.Contains(conn.Arrow))
-                    {
-                        ScriptCanvas.Children.Remove(conn.Arrow);
-                    }
-                    _connections.Remove(conn);
-
-                    // 强制更新布局（可选，但有助于立即刷新视觉）
-                    ScriptCanvas.UpdateLayout();
-                }
+                return;
             }
+
+            // 找出对应的连接关系
+            var conn = _connections.FirstOrDefault(x => x.Line == polyline);
+            if (conn == null)
+                return;
+            // 移除折线和箭头
+            if (conn.Line != null && ScriptCanvas.Children.Contains(conn.Line))
+            {
+                ScriptCanvas.Children.Remove(conn.Line);
+            }
+
+            if (conn.Arrow != null && ScriptCanvas.Children.Contains(conn.Arrow))
+            {
+                ScriptCanvas.Children.Remove(conn.Arrow);
+            }
+
+            _connections.Remove(conn);
+
+            // 强制更新布局（可选，但有助于立即刷新视觉）
+            ScriptCanvas.UpdateLayout();
         }
 
         private void ParamItem_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is MenuItem menuItem && menuItem.Tag is ScriptUserControl tag)
+            if (sender is not MenuItem menuItem || menuItem.Tag is not ScriptUserControl tag) return;
+            if (_controlParamDic.TryGetValue(tag, out var paramModels))
             {
-                if (_controlParamDic.TryGetValue(tag, out var paramModels))
+                if (paramModels.Count == 0)
                 {
-                    if (paramModels.Count == 0)
-                    {
-                        MessageBox.Show($"{tag.LabelText} 该方法无其他参数", "参数信息", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
-                    else
-                    {
-                        _controlParamDic[tag] = new ParamWindow(paramModels).Show();
-                    }
+                    MessageBox.Show($"{tag.LabelText} 该方法无其他参数", "参数信息", MessageBoxButton.OK,
+                                    MessageBoxImage.Information);
                 }
                 else
                 {
-                    MessageBox.Show("该控件没有参数信息。", "参数信息", MessageBoxButton.OK, MessageBoxImage.Information);
+                    // 显示参数窗口并获取更新后的参数列表
+                    var updatedParamModels = new ParamWindow(paramModels).Show();
+
+                    // 更新 _controlParamDic 中的参数列表
+                    _controlParamDic[tag] = updatedParamModels;
+                    //  _controlParamDic[tag] = new ParamWindow(paramModels).Show();
                 }
+            }
+            else
+            {
+                MessageBox.Show("该控件没有参数信息。", "参数信息", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
         private void DeleteItem_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is MenuItem menuItem && menuItem.Tag is ScriptUserControl tag)
+            if (sender is not MenuItem menuItem || menuItem.Tag is not ScriptUserControl tag)
+                return;
+            // 找出所有与该控件相关的连接（起点或终点）
+            var toRemove = _connections.Where(x => x.StartControl == tag || x.EndControl == tag).ToList();
+
+            // 先移除对应的可视元素（折线与箭头），再从连接列表中删除记录
+            foreach (Connection conn in toRemove)
             {
-                // 找出所有与该控件相关的连接（起点或终点）
-                var toRemove = _connections.Where(x => x.StartControl == tag || x.EndControl == tag).ToList();
-
-                // 先移除对应的可视元素（折线与箭头），再从连接列表中删除记录
-                foreach (var conn in toRemove)
+                if (conn.Line != null && ScriptCanvas.Children.Contains(conn.Line))
                 {
-                    if (conn.Line != null && ScriptCanvas.Children.Contains(conn.Line))
-                    {
-                        ScriptCanvas.Children.Remove(conn.Line);
-                    }
-
-                    if (conn.Arrow != null && ScriptCanvas.Children.Contains(conn.Arrow))
-                    {
-                        ScriptCanvas.Children.Remove(conn.Arrow);
-                    }
-
-                    _connections.Remove(conn);
+                    ScriptCanvas.Children.Remove(conn.Line);
                 }
 
-                // 退订事件监听，避免悬挂引用
-                tag.ConnectorClicked -= Ctrl_ConnectorClicked;
-                tag.PositionChanged -= Ctrl_PositionChanged;
-
-                // 从 Canvas 中移除控件
-                if (ScriptCanvas.Children.Contains(tag))
+                if (conn.Arrow != null && ScriptCanvas.Children.Contains(conn.Arrow))
                 {
-                    ScriptCanvas.Children.Remove(tag);
+                    ScriptCanvas.Children.Remove(conn.Arrow);
                 }
-                // 强制更新布局（可选，但有助于立即刷新视觉）
-                ScriptCanvas.UpdateLayout();
+
+                _connections.Remove(conn);
             }
+
+            // 退订事件监听，避免悬挂引用
+            tag.ConnectorClicked -= Ctrl_ConnectorClicked;
+            tag.PositionChanged -= Ctrl_PositionChanged;
+
+            // 从 Canvas 中移除控件
+            if (ScriptCanvas.Children.Contains(tag))
+            {
+                ScriptCanvas.Children.Remove(tag);
+            }
+
+            if (_controlParamDic.ContainsKey(tag))
+            {
+                _controlParamDic.Remove(tag);
+            }
+
+            // 强制更新布局（可选，但有助于立即刷新视觉）
+            ScriptCanvas.UpdateLayout();
         }
 
         private void ScriptCanvas_Drop(object sender, DragEventArgs e)
@@ -251,7 +275,7 @@ namespace ImageHandle.Scripts
 
             var tb = new ScriptUserControl()
             {
-                LabelText = text, 
+                LabelText = text,
             };
 
             _controlParamDic[tb] = ScriptService.Instance.Navigate(text, _viewModel.IsCN);
@@ -300,10 +324,10 @@ namespace ImageHandle.Scripts
                 _startPoint = e.CanvasPosition;
                 _tempPolyline = new Polyline
                 {
-                    Stroke = Brushes.Black,
+                    Stroke = _tempPolylineBrush,
                     StrokeThickness = 2,
                     IsHitTestVisible = false,
-                    Points = BuildManhattanPoints(_startPoint, _startPoint)
+                    Points = CreateConnectionPoints(_startPoint, _startPoint)
                 };
                 // 将临时线加到 Canvas（放在较低层，避免拦截连接点）
                 canvas.Children.Add(_tempPolyline);
@@ -322,6 +346,7 @@ namespace ImageHandle.Scripts
                         canvas.Children.Remove(_tempPolyline);
                         _tempPolyline = null;
                     }
+
                     canvas.MouseMove -= Canvas_MouseMove;
                     this.KeyDown -= MainWindow_KeyDown;
                     _isConnecting = false;
@@ -329,15 +354,16 @@ namespace ImageHandle.Scripts
                     _startConnectorName = null;
                     return;
                 }
+
                 // 结束连接：用终点创建最终折线（曼哈顿折线），并记录连接关系
                 var endPoint = e.CanvasPosition;
 
                 var finalLine = new Polyline
                 {
-                    Stroke = Brushes.Blue,
+                    Stroke = _polylineBrush,
                     StrokeThickness = 2,
                     IsHitTestVisible = false,
-                    Points = BuildManhattanPoints(_startPoint, endPoint)
+                    Points = CreateConnectionPoints(_startPoint, endPoint)
                 };
 
                 if (_tempPolyline != null) canvas.Children.Remove(_tempPolyline);
@@ -361,8 +387,8 @@ namespace ImageHandle.Scripts
                     var pts = finalLine.Points;
                     if (pts.Count >= 2)
                     {
-                        var tip = pts[pts.Count - 1];
-                        var prev = pts[pts.Count - 2];
+                        var tip = pts[^1];
+                        var prev = pts[^2];
                         conn.Arrow = CreateOrUpdateArrow(null, tip, prev, finalLine.Stroke);
                         // 将箭头放在同一 canvas 中
                         if (conn.Arrow != null && !canvas.Children.Contains(conn.Arrow))
@@ -410,14 +436,14 @@ namespace ImageHandle.Scripts
             var endPt = conn.EndControl.GetConnectorPosition(conn.EndConnectorName, ScriptCanvas);
 
             // 更新折线点
-            conn.Line.Points = BuildManhattanPoints(startPt, endPt);
+            conn.Line.Points = CreateConnectionPoints(startPt, endPt);
 
             // 更新/创建箭头（基于最后两点方向）
             var pts = conn.Line.Points;
             if (pts.Count >= 2)
             {
-                var tip = pts[pts.Count - 1];
-                var prev = pts[pts.Count - 2];
+                var tip = pts[^1];
+                var prev = pts[^2];
                 conn.Arrow = CreateOrUpdateArrow(conn.Arrow, tip, prev, conn.Line.Stroke);
                 if (conn.Arrow != null && !ScriptCanvas.Children.Contains(conn.Arrow))
                 {
@@ -442,6 +468,7 @@ namespace ImageHandle.Scripts
             {
                 wnd.Activate();
             }
+
             // 强制把键盘焦点设置到 Window（或可设置到特定元素）
             Keyboard.Focus(wnd);
         }
@@ -453,30 +480,33 @@ namespace ImageHandle.Scripts
             wnd.PreviewKeyDown -= MainWindow_KeyDown;
         }
 
+        #region 箭头
+
         // 创建或更新箭头 Path；箭头在几何上以 (0,0) 为箭尖（指向 +X），再旋转平移到目标位置
-        private System.Windows.Shapes.Path CreateOrUpdateArrow(System.Windows.Shapes.Path? arrow, System.Windows.Point tip, System.Windows.Point prev, Brush? fill)
+        private System.Windows.Shapes.Path CreateOrUpdateArrow(System.Windows.Shapes.Path? arrow,
+                                                               System.Windows.Point tip,
+                                                               System.Windows.Point prev,
+                                                               Brush? fill)
         {
             const double arrowLength = 12.0;
             const double arrowHalfWidth = 6.0;
 
-            if (arrow == null)
+            arrow ??= new System.Windows.Shapes.Path
             {
-                arrow = new System.Windows.Shapes.Path
-                {
-                    Fill = (fill as SolidColorBrush) ?? Brushes.Black,
-                    Stroke = null,
-                    IsHitTestVisible = false
-                };
-            }
+                Fill = (fill as SolidColorBrush) ?? Brushes.Black,
+                Stroke = null,
+                IsHitTestVisible = false
+            };
 
             // 创建三角形几何： 顶点在 (0,0)，底边两点在 (-arrowLength, -arrowHalfWidth) 和 (-arrowLength, arrowHalfWidth)
-            var geom = new StreamGeometry();
-            using (var ctx = geom.Open())
+            StreamGeometry geom = new StreamGeometry();
+            using (StreamGeometryContext ctx = geom.Open())
             {
                 ctx.BeginFigure(new System.Windows.Point(0, 0), true, true);
                 ctx.LineTo(new System.Windows.Point(-arrowLength, -arrowHalfWidth), true, false);
                 ctx.LineTo(new System.Windows.Point(-arrowLength, arrowHalfWidth), true, false);
             }
+
             geom.Freeze();
             arrow.Data = geom;
 
@@ -486,13 +516,99 @@ namespace ImageHandle.Scripts
             double angle = Math.Atan2(dy, dx) * 180.0 / Math.PI;
 
             // 先旋转，再平移到 tip（箭尖位置）
-            var tg = new TransformGroup();
+            TransformGroup tg = new TransformGroup();
             tg.Children.Add(new RotateTransform(angle));
             tg.Children.Add(new TranslateTransform(tip.X, tip.Y));
             arrow.RenderTransform = tg;
 
             return arrow;
         }
+
+        /// <summary>
+        /// 在贝塞尔曲线上添加方向指示（可以用作单独的装饰层）
+        /// 返回一组表示方向箭头的 Path 对象
+        /// </summary>
+        public static List<System.Windows.Shapes.Path> AddDirectionArrows(PointCollection curvePoints,
+            double arrowSize = 10,
+            int arrowCount = 3,
+            Color arrowColor = default)
+        {
+            if (arrowColor == default) arrowColor = Colors.Black;
+
+            var arrows = new List<System.Windows.Shapes.Path>();
+
+            if (curvePoints == null || curvePoints.Count < 2)
+                return arrows;
+
+            // 等距位置：0.2, 0.4, 0.6, 0.8 (避开起点和终点)
+            for (int i = 1; i <= arrowCount; i++)
+            {
+                double t = (double)i / (arrowCount + 1); // 0.25, 0.5, 0.75
+                int index = (int)(t * (curvePoints.Count - 1));
+                index = Math.Max(0, Math.Min(curvePoints.Count - 2, index));
+
+                // 获取当前位置和下一个位置（方向）
+                System.Windows.Point current = curvePoints[index];
+                System.Windows.Point next = curvePoints[index + 1];
+
+                // 计算方向向量
+                Vector direction = next - current;
+                if (direction.Length < 0.001) continue;
+                direction.Normalize();
+
+                // 创建箭头（一个简单的三角形）
+                System.Windows.Shapes.Path arrow = CreateSingleArrow(current, direction, arrowSize, arrowColor);
+                arrows.Add(arrow);
+            }
+
+            return arrows;
+        }
+
+        /// <summary>
+        /// 创建一个单独的小箭头（最简单版本）
+        /// </summary>
+        private static System.Windows.Shapes.Path CreateSingleArrow(System.Windows.Point position, Vector direction, double size, Color color)
+        {
+            // 计算箭头的三个顶点
+            double angle = 25 * Math.PI / 180; // 25度小箭头
+
+            // 箭头左右两个翼
+            Vector left = new Vector(
+                direction.X * Math.Cos(angle) - direction.Y * Math.Sin(angle),
+                direction.X * Math.Sin(angle) + direction.Y * Math.Cos(angle)
+            );
+            Vector right = new Vector(
+                direction.X * Math.Cos(-angle) - direction.Y * Math.Sin(-angle),
+                direction.X * Math.Sin(-angle) + direction.Y * Math.Cos(-angle)
+            );
+
+            System.Windows.Point tip = position + direction * (size / 2);  // 箭头尖端
+            System.Windows.Point leftWing = position - left * size;        // 左翼
+            System.Windows.Point rightWing = position - right * size;      // 右翼
+
+            // 构建 Path
+            var figure = new PathFigure
+            {
+                StartPoint = tip,
+                IsClosed = true,
+                IsFilled = true
+            };
+            figure.Segments.Add(new LineSegment(leftWing, true));
+            figure.Segments.Add(new LineSegment(rightWing, true));
+
+            var geometry = new PathGeometry();
+            geometry.Figures.Add(figure);
+
+            return new System.Windows.Shapes.Path
+            {
+                Data = geometry,
+                Fill = new SolidColorBrush(color),
+                Stroke = new SolidColorBrush(color),
+                StrokeThickness = 0.5
+            };
+        }
+
+        #endregion 箭头
 
         private void Canvas_MouseMove(object? sender, MouseEventArgs e)
         {
@@ -501,7 +617,7 @@ namespace ImageHandle.Scripts
             var pos = e.GetPosition(canvas);
 
             // 更新临时折线为曼哈顿折线（根据鼠标当前位置作为终点）
-            _tempPolyline.Points = BuildManhattanPoints(_startPoint, pos);
+            _tempPolyline.Points = CreateConnectionPoints(_startPoint, pos);
         }
 
         private void MainWindow_KeyDown(object? sender, KeyEventArgs e)
@@ -520,39 +636,99 @@ namespace ImageHandle.Scripts
         }
 
         // 生成简单的“曼哈顿”折线路径（水平/垂直折线）
-        private static PointCollection BuildManhattanPoints(System.Windows.Point start, System.Windows.Point end)
+        private static PointCollection CreateConnectionPoints(System.Windows.Point start, System.Windows.Point end)
         {
-            var pts = new PointCollection();
+            // var pts = new PointCollection();
+            //// 如果水平或垂直重合，直接用两点
+            //if (Math.Abs(start.X - end.X) < 1e-6 || Math.Abs(start.Y - end.Y) < 1e-6)
+            //{
+            //    pts.Add(start);
+            //    pts.Add(end);
+            //    return pts;
+            //}
+            //pts.Add(start);
+            //pts.Add(new System.Windows.Point(start.X, (start.Y + end.Y) / 2));
+            //pts.Add(new System.Windows.Point(end.X, (start.Y + end.Y) / 2));
+            //pts.Add(end);
+            // return pts;
+            return GenerateSmoothBezierPoints(start, end);
+        }
 
-            // 如果水平或垂直重合，直接用两点
-            if (Math.Abs(start.X - end.X) < 1e-6 || Math.Abs(start.Y - end.Y) < 1e-6)
+        #region 贝塞尔曲线
+
+        /// <summary>
+        /// 生成两点之间的三阶贝塞尔曲线点集
+        /// </summary>
+        /// <param name="startPoint">起点</param>
+        /// <param name="endPoint">终点</param>
+        /// <param name="controlPoint1">控制点1</param>
+        /// <param name="controlPoint2">控制点2</param>
+        /// <param name="segmentCount">将曲线分成的段数（点数 = segmentCount + 1）</param>
+        /// <returns>曲线上的点集合</returns>
+        public static PointCollection GenerateCubicBezierPoints(
+            System.Windows.Point startPoint, System.Windows.Point endPoint,
+            System.Windows.Point controlPoint1, System.Windows.Point controlPoint2,
+            int segmentCount = 50)
+        {
+            var points = new PointCollection();
+
+            for (int i = 0; i <= segmentCount; i++)
             {
-                pts.Add(start);
-                pts.Add(end);
-                return pts;
+                double t = (double)i / segmentCount;
+                System.Windows.Point point = CalculateCubicBezierPoint(t, startPoint, controlPoint1, controlPoint2, endPoint);
+                points.Add(point);
             }
 
-            pts.Add(start);
-            pts.Add(new System.Windows.Point(start.X, (start.Y + end.Y) / 2));
-            pts.Add(new System.Windows.Point(end.X, (start.Y + end.Y) / 2));
-            pts.Add(end);
-
-            return pts;
+            return points;
         }
+
+        /// <summary>
+        /// 计算三阶贝塞尔曲线上的点
+        /// B(t) = (1-t)³P0 + 3(1-t)²tP1 + 3(1-t)t²P2 + t³P3
+        /// </summary>
+        private static System.Windows.Point CalculateCubicBezierPoint(double t, System.Windows.Point p0, System.Windows.Point p1, System.Windows.Point p2, System.Windows.Point p3)
+        {
+            double u = 1 - t;
+            double uu = u * u;
+            double uuu = uu * u;
+            double tt = t * t;
+            double ttt = tt * t;
+
+            double x = uuu * p0.X + 3 * uu * t * p1.X + 3 * u * tt * p2.X + ttt * p3.X;
+            double y = uuu * p0.Y + 3 * uu * t * p1.Y + 3 * u * tt * p2.Y + ttt * p3.Y;
+
+            return new System.Windows.Point(x, y);
+        }
+
+        /// <summary>
+        /// 自动生成控制点（产生平滑的 S 形曲线）
+        /// </summary>
+        public static PointCollection GenerateSmoothBezierPoints(System.Windows.Point startPoint, System.Windows.Point endPoint, int segmentCount = 50)
+        {
+            // 控制点偏移量（可根据需要调整）
+            double offset = Math.Min(Math.Abs(endPoint.X - startPoint.X) * 0.3, 200);
+
+            System.Windows.Point controlPoint1 = new System.Windows.Point(startPoint.X + offset, startPoint.Y);
+            System.Windows.Point controlPoint2 = new System.Windows.Point(endPoint.X - offset, endPoint.Y);
+
+            return GenerateCubicBezierPoints(startPoint, endPoint, controlPoint1, controlPoint2, segmentCount);
+        }
+
+        #endregion 贝塞尔曲线
 
         /// <summary>
         /// 获取所有连接链路（每条链路为按顺序的 Connection 列表）。
         /// 算法：构建有向图（StartControl -> EndControl），
         /// 从入度为0的节点开始 DFS，得到所有从源到汇的路径；若无入度为0的源（存在环），则从每个节点开始搜索并在遇到回路时收集该回路路径。
         /// </summary>
-        public List<List<Connection>> GetAllConnectionPaths()
+        private List<List<Connection>> GetAllConnectionPaths()
         {
             // 构建邻接表（StartControl -> list of Connection）
-            var adj = new Dictionary<ScriptUserControl, List<Connection>>();
-            var nodes = new HashSet<ScriptUserControl>();
-            var indegree = new Dictionary<ScriptUserControl, int>();
+            Dictionary<ScriptUserControl, List<Connection>> adj = new Dictionary<ScriptUserControl, List<Connection>>();
+            HashSet<ScriptUserControl> nodes = new HashSet<ScriptUserControl>();
+            Dictionary<ScriptUserControl, int> indegree = new Dictionary<ScriptUserControl, int>();
 
-            foreach (var c in _connections)
+            foreach (Connection c in _connections)
             {
                 if (c.StartControl == null || c.EndControl == null) continue;
 
@@ -564,39 +740,40 @@ namespace ImageHandle.Scripts
                     list = new List<Connection>();
                     adj[c.StartControl] = list;
                 }
+
                 list.Add(c);
 
-                if (!indegree.ContainsKey(c.StartControl)) indegree[c.StartControl] = 0;
-                if (!indegree.ContainsKey(c.EndControl)) indegree[c.EndControl] = 0;
+                indegree.TryAdd(c.StartControl, 0);
+                indegree.TryAdd(c.EndControl, 0);
                 indegree[c.EndControl] = indegree[c.EndControl] + 1;
             }
 
             // 确保所有节点在 indegree 中存在
-            foreach (var n in nodes)
+            foreach (ScriptUserControl n in nodes)
             {
-                if (!indegree.ContainsKey(n)) indegree[n] = 0;
+                indegree.TryAdd(n, 0);
             }
 
             var results = new List<List<Connection>>();
 
             // 找到所有入度为0的源节点
-            var sources = nodes.Where(n => indegree.TryGetValue(n, out var d) && d == 0).ToList();
+            List<ScriptUserControl> sources = nodes.Where(n => indegree.TryGetValue(n, out var d) && d == 0).ToList();
 
             // 如果没有源（可能全部在环中），使用所有节点作为起点以便发现环
-            var startNodes = sources.Count > 0 ? sources : nodes.ToList();
+            List<ScriptUserControl> startNodes = sources.Count > 0 ? sources : nodes.ToList();
 
-            foreach (var start in startNodes)
+            foreach (ScriptUserControl start in startNodes)
             {
-                var visited = new HashSet<ScriptUserControl> { start };
+                HashSet<ScriptUserControl> visited = new HashSet<ScriptUserControl> { start };
                 DFSPaths(start, new List<Connection>(), visited, adj, results);
             }
 
             // 去重（不同起点或路径可能产生重复）
-            var unique = new List<List<Connection>>();
-            var seen = new HashSet<string>();
-            foreach (var path in results)
+            List<List<Connection>> unique = new List<List<Connection>>();
+            HashSet<string> seen = new HashSet<string>();
+            foreach (List<Connection> path in results)
             {
-                var key = PathKey(path);
+                string key = PathKey(path);
                 if (!seen.Contains(key))
                 {
                     seen.Add(key);
@@ -621,12 +798,13 @@ namespace ImageHandle.Scripts
                 {
                     results.Add(new List<Connection>(path));
                 }
+
                 return;
             }
 
-            foreach (var edge in outs)
+            foreach (Connection edge in outs)
             {
-                var next = edge.EndControl;
+                ScriptUserControl? next = edge.EndControl;
                 if (next == null) continue;
 
                 if (visited.Contains(next))
@@ -653,10 +831,11 @@ namespace ImageHandle.Scripts
             var sb = new StringBuilder();
             foreach (var c in path)
             {
-                var a = c.StartControl?.LabelText ?? "null";
-                var b = c.EndControl?.LabelText ?? "null";
+                string a = c.StartControl?.LabelText ?? "null";
+                string b = c.EndControl?.LabelText ?? "null";
                 sb.Append($"{a}[{c.StartConnectorName}]->{b}[{c.EndConnectorName}]|");
             }
+
             return sb.ToString();
         }
 
@@ -666,86 +845,96 @@ namespace ImageHandle.Scripts
         /// </summary>
         public List<string> GetAllConnectionPathsAsStrings()
         {
-            var paths = GetAllConnectionPaths();
-            var result = new List<string>();
-            foreach (var path in paths)
+            List<List<Connection>> paths = GetAllConnectionPaths();
+            List<string> result = new List<string>();
+            foreach (List<Connection> path in paths)
             {
                 if (path.Count == 0) continue;
-                var sb = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
                 // 起点
                 sb.Append(path[0].StartControl?.LabelText ?? "null");
-                foreach (var edge in path)
+                foreach (Connection edge in path)
                 {
                     sb.Append($" --({edge.StartConnectorName}->{edge.EndConnectorName})-> ");
                     sb.Append(edge.EndControl?.LabelText ?? "null");
                 }
+
                 result.Add(sb.ToString());
             }
+
             return result;
         }
 
         public List<List<string>> GetConnectionsNames()
         {
-            var paths = GetAllConnectionPaths();
-            var result = new List<List<string>>();
-            foreach (var path in paths)
+            List<List<Connection>> paths = GetAllConnectionPaths();
+            List<List<string>> result = new List<List<string>>();
+            foreach (List<Connection> path in paths)
             {
-                var tempList = new List<string>();
+                List<string> tempList = new List<string>();
                 if (path.Count == 0) continue;
-                var sb = new StringBuilder();
+                StringBuilder sb = new StringBuilder();
                 // 起点
                 tempList.Add(path[0].StartControl?.LabelText ?? "null");
-                foreach (var edge in path)
+                foreach (Connection edge in path)
                 {
                     tempList.Add(edge.EndControl?.LabelText ?? "null");
                 }
+
                 result.Add(tempList);
             }
+
             return result;
         }
 
         // 获取每一条路径上 每个方法及其对应的参数列表
-        public List<List<(string, List<ScriptParamModel>)>> GetConnectionModel()
+        private List<List<(string, List<ScriptParamModel>)>> GetConnectionModel()
         {
-            var paths = GetAllConnectionPaths();
-            var result = new List<List<(string, List<ScriptParamModel>)>>();
-            foreach (var connectionList in paths)
+            List<List<Connection>> paths = GetAllConnectionPaths();
+            List<List<(string, List<ScriptParamModel>)>> result = new List<List<(string, List<ScriptParamModel>)>>();
+            foreach (List<Connection> connectionList in paths)
             {
-                var tempList = new List<(string, List<ScriptParamModel>)>();
+                List<(string, List<ScriptParamModel>)> tempList = new List<(string, List<ScriptParamModel>)>();
                 if (connectionList.Count == 0)
                 {
                     continue;
                 }
+
                 // 起点
-                tempList.Add((connectionList[0].StartControl?.LabelText ?? "null", _controlParamDic[connectionList[0].StartControl]));
-                foreach (var connection in connectionList)
+                tempList.Add((connectionList[0].StartControl?.LabelText ?? "null",
+                              _controlParamDic[connectionList[0].StartControl]));
+                foreach (Connection connection in connectionList)
                 {
                     tempList.Add((connection.EndControl?.LabelText ?? "null", _controlParamDic[connection.EndControl]));
                 }
+
                 result.Add(tempList);
             }
+
             return result;
         }
 
         //执行脚本
         private async void ExcuteButton_Click(object sender, RoutedEventArgs e)
-        {  
+        {
             if (_viewModel.SrcImagePath == null || !File.Exists(_viewModel.SrcImagePath))
             {
                 MessageBox.Show("请先选择源图像。");
                 return;
             }
-            var path = GetConnectionModel();
-            if (path.Count == 0)
+
+            List<List<(string, List<ScriptParamModel>)>> path = GetConnectionModel();
+            switch (path.Count)
             {
-                MessageBox.Show("没有连接路径可执行。");
-                return;
+                case 0:
+                    MessageBox.Show("没有连接路径可执行。");
+                    return;
+
+                case > 1:
+                    MessageBox.Show("多条路径。");
+                    return;
             }
-            if (path.Count > 1)
-            {
-                MessageBox.Show("多条路径。");
-                return;
-            }
+
             // 仅执行第一条路径  第一条路径上的方法名及其参数列表
             List<(string, List<ScriptParamModel>)> methodsList = path[0];
 
@@ -753,6 +942,7 @@ namespace ImageHandle.Scripts
             {
                 return;
             }
+
             Type type = typeof(ImageOperateMethods);
 
             Mat tempMat = new Mat(_viewModel.SrcImagePath);
@@ -763,6 +953,7 @@ namespace ImageHandle.Scripts
                 {
                     methodName = ScriptService.Instance.GetMethodName(methodName, false);
                 }
+
                 // 获取公共静态方法
                 MethodInfo publicMethod = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static);
                 if (publicMethod == null)
@@ -770,22 +961,24 @@ namespace ImageHandle.Scripts
                     MessageBox.Show($"找不到方法: {methodsList[i].Item1}");
                     return;
                 }
+
                 // 所有方法的参数都是  一张Mat 加上若干其他参数
                 // Mat 为输入图像 或者上一个方法的输出图像
                 List<object> paramList = new List<object>();
                 paramList.Add(tempMat);
                 for (int j = 0; j < methodsList[i].Item2.Count; j++)
                 {
-                    var paramModel = methodsList[i].Item2[j];
+                    ScriptParamModel paramModel = methodsList[i].Item2[j];
                     paramList.Add(paramModel.GetValue());
                 }
+
                 try
                 {
                     object invokeResult = new object();
                     await Task.Run(() =>
-                    {
-                        invokeResult = publicMethod.Invoke(null, paramList.ToArray());
-                    });
+                                   {
+                                       invokeResult = publicMethod.Invoke(null, paramList.ToArray());
+                                   });
 
                     if (invokeResult is Mat matResult)
                     {
@@ -793,18 +986,21 @@ namespace ImageHandle.Scripts
                         //tempMat = _viewModel.DstMat;
 
                         // 克隆一份确保底层内存独立，强制在 UI 线程设置属性
-                        var clone = matResult.Clone();
+                        Mat clone = matResult.Clone();
                         Dispatcher.Invoke(() => _viewModel.DstMat = clone);
                         tempMat = clone;
                     }
+
                     await Task.Delay(500);
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"调用方法 {publicMethod.Name} 失败: {ex.ToString()}", "执行异常", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"调用方法 {publicMethod.Name} 失败: {ex.ToString()}", "执行异常", MessageBoxButton.OK,
+                                    MessageBoxImage.Error);
                     return;
                 }
             }
+
             MessageBox.Show("完成");
         }
 
@@ -817,17 +1013,19 @@ namespace ImageHandle.Scripts
 
         private void CleanControlButton_Click(object sender, RoutedEventArgs e)
         {
-            var paths = GetAllConnectionPaths();
+            List<List<Connection>>? paths = GetAllConnectionPaths();
             if (paths == null || paths.Count == 0)
             {
                 MessageBox.Show("没有路径，无法清理控件。");
                 return;
             }
+
             if (paths.Count > 1)
             {
                 MessageBox.Show("存在多条路径，无法清理控件。");
                 return;
             }
+
             List<Connection> path = paths[0];
             // 设置第一个控件位置不变，为基准点，后续控件垂直排列，间隔100
             double left = Canvas.GetLeft(path[0].StartControl);
@@ -837,14 +1035,16 @@ namespace ImageHandle.Scripts
                 Canvas.SetLeft(path[i].EndControl, left);
                 Canvas.SetTop(path[i].EndControl, top + (i + 1) * 100);
             }
+
             ScriptCanvas.UpdateLayout();
-            foreach (var conn in _connections)
+            foreach (Connection conn in _connections)
             {
                 // 重置所有连接点为上下连接，强制更新线段
                 conn.StartConnectorName = "BottomConnector";
                 conn.EndConnectorName = "TopConnector";
                 UpdateConnectionLine(conn);
             }
+
             ScriptCanvas.UpdateLayout();
         }
     }

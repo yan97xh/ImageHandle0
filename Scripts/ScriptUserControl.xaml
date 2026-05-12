@@ -6,12 +6,12 @@
     xmlns:local="clr-namespace:ImageHandle.Scripts"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    Width="160"
+    Width="140"
     Height="40"
-    MinWidth="160"
+    MinWidth="140"
     MinHeight="40"
     d:DesignHeight="40"
-    d:DesignWidth="160"
+    d:DesignWidth="140"
     Background="Transparent"
     MouseDown="UserControl_MouseDown"
     MouseMove="UserControl_MouseMove"
@@ -21,80 +21,61 @@
     <UserControl.Resources>
         <SolidColorBrush x:Key="ConnectorStroke" Color="White" />
         <sys:Double x:Key="ConnectorSize">5</sys:Double>
+        <Style x:Key="ConnectorStyle" TargetType="Ellipse">
+            <Setter Property="Width" Value="{StaticResource ConnectorSize}" />
+            <Setter Property="Height" Value="{StaticResource ConnectorSize}" />
+            <Setter Property="Margin" Value="-1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Fill" Value="{StaticResource ConnectorStroke}" />
+            <Setter Property="Stroke" Value="{StaticResource ConnectorStroke}" />
+            <Setter Property="StrokeThickness" Value="2" />
+            <EventSetter Event="MouseLeftButtonDown" Handler="Connector_MouseDown" />
+        </Style>
     </UserControl.Resources>
     <Grid Background="Transparent">
-        <!--  边框  -->
+        <!-- 边框 -->
         <Border
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
-            Background="Gray"
+            Background="DarkSlateGray"
             BorderBrush="Black"
             BorderThickness="1"
             CornerRadius="10" />
-        <!--  中心点圆形  -->
+        <!-- 中心点圆形 -->
         <Grid>
-            <!--  顶部中心  -->
+            <!-- 顶部中心 -->
             <Ellipse
                 x:Name="TopConnector"
-                Width="{StaticResource ConnectorSize}"
-                Height="{StaticResource ConnectorSize}"
-                Margin="0,0,0,0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top"
-                Cursor="Hand"
-                Fill="Transparent"
-                MouseLeftButtonDown="Connector_MouseDown"
-                Stroke="{StaticResource ConnectorStroke}"
-                StrokeThickness="1" />
-
-            <!--  底部中心  -->
+                Style="{StaticResource ConnectorStyle}" />
+            <!-- 底部中心 -->
             <Ellipse
                 x:Name="BottomConnector"
-                Width="{StaticResource ConnectorSize}"
-                Height="{StaticResource ConnectorSize}"
-                Margin="0,0,0,0"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Bottom"
-                Cursor="Hand"
-                Fill="Transparent"
-                MouseLeftButtonDown="Connector_MouseDown"
-                Stroke="{StaticResource ConnectorStroke}"
-                StrokeThickness="1" />
+                Style="{StaticResource ConnectorStyle}" />
 
-            <!--  左侧中心  -->
+            <!-- 左侧中心 -->
             <Ellipse
                 x:Name="LeftConnector"
-                Width="{StaticResource ConnectorSize}"
-                Height="{StaticResource ConnectorSize}"
-                Margin="0,0,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Cursor="Hand"
-                Fill="Transparent"
-                MouseLeftButtonDown="Connector_MouseDown"
-                Stroke="{StaticResource ConnectorStroke}"
-                StrokeThickness="1" />
+                Style="{StaticResource ConnectorStyle}" />
 
-            <!--  右侧中心  -->
+            <!-- 右侧中心 -->
             <Ellipse
                 x:Name="RightConnector"
-                Width="{StaticResource ConnectorSize}"
-                Height="{StaticResource ConnectorSize}"
-                Margin="0,0,0,0"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Cursor="Hand"
-                Fill="Transparent"
-                MouseLeftButtonDown="Connector_MouseDown"
-                Stroke="{StaticResource ConnectorStroke}"
-                StrokeThickness="1" />
+                Style="{StaticResource ConnectorStyle}" />
         </Grid>
         <TextBlock
             x:Name="ItemTextBlock"
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontFamily="Consolas"
-            FontSize="14"
+            FontSize="12"
             FontWeight="Bold"
             Foreground="White"
             Text="{Binding LabelText, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}" />

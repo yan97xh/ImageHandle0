@@ -110,7 +110,7 @@
                     <!-- 上下实现效果一样 -->
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding ROIRectangleColorCommand}" />
+                            <i:InvokeCommandAction Command="{Binding ProcessROIRectangleColorCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <!--#endregion-->
@@ -144,7 +144,11 @@
                     Command="{Binding ROIDetectCommand}" />
             </StackPanel>
             <Border BorderThickness="0,2,0,0" BorderBrush="#11aabd" />
-            <local:DstImgShowUserControl Margin="0,20" LabelText="保存图像" DstImageSource="{Binding ROIDetectMat, Mode=TwoWay}" />
+            <local:DstImgShowUserControl
+                Margin="0,20"
+                LabelText="保存图像"
+                DstImageSource="{Binding ROIDetectMat, Mode=TwoWay}"
+                ImageStretch="Uniform" />
         </StackPanel>
     </Grid>
 </UserControl>

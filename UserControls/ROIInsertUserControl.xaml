@@ -114,7 +114,7 @@
                     <!-- 上下实现效果一样 -->
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding ROIRectangleColorCommand}" />
+                            <i:InvokeCommandAction Command="{Binding ProcessROIRectangleColorCommand}" />
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                     <!--#endregion-->
@@ -171,12 +171,12 @@
                     Margin="20,10"
                     Style="{StaticResource ImgOperateBtnStyle}"
                     Content="插入图像"
-                    Command="{Binding InserImageCommand}" />
+                    Command="{Binding InsertImageCommand}" />
                 <Button
                     Margin="20,10"
                     Style="{StaticResource ImgOperateBtnStyle}"
                     Content="撤销"
-                    Command="{Binding RevocationCommand}" />
+                    Command="{Binding ProcessRevocationCommand}" />
                 <Button
                     Margin="20,10"
                     Style="{StaticResource ImgOperateBtnStyle}"

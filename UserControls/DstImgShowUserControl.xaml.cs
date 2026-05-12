@@ -54,6 +54,16 @@ namespace ImageHandle.UserControls
         public static readonly DependencyProperty LabelTextProperty =
             DependencyProperty.Register("LabelText", typeof(string), typeof(DstImgShowUserControl), new PropertyMetadata("输出图像"));
 
+        public System.Windows.Media.Stretch ImageStretch
+        {
+            get { return (System.Windows.Media.Stretch)GetValue(ImageStretchProperty); }
+            set { SetValue(ImageStretchProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for ImageStretch.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty ImageStretchProperty =
+            DependencyProperty.Register("ImageStretch", typeof(System.Windows.Media.Stretch), typeof(DstImgShowUserControl), new PropertyMetadata(System.Windows.Media.Stretch.Fill));
+
         #endregion 依赖属性
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -94,6 +104,7 @@ namespace ImageHandle.UserControls
 
         private DateTime _lastClickTime;
         private const int DoubleClickThreshold = 300; // 双击时间间隔阈值，单位为毫秒
+
         private void Image_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if ((DateTime.Now - _lastClickTime).TotalMilliseconds < DoubleClickThreshold)

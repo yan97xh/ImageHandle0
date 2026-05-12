@@ -1,4 +1,6 @@
-﻿using ImageHandle.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ImageHandle.Helpers;
 using ImageHandle.Models;
 using OpenCvSharp;
 using System.Collections.ObjectModel;
@@ -8,51 +10,22 @@ using System.Windows.Input;
 
 namespace ImageHandle.ViewModels
 {
-    public class MorphologicalViewModel : ViewModelBase
+    public partial class MorphologicalViewModel : ObservableObject
     {
         public MorphologicalViewModel()
         {
-            MorphologicalCommand = new Commands.Command<MorphologicalMode>(ProcessMorphologicalOperations);
             InitOperations();
         }
 
-        #region 输入图像
-
+        [ObservableProperty]
         private string _srcImagePath;
 
-        public string SrcImagePath
-        {
-            get => _srcImagePath;
-            set
-            {
-                _srcImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入图像
-
-        #region 输出图像
-
+        [ObservableProperty]
         private Mat _dstMat;
-
-        public Mat DstMat
-        {
-            get => _dstMat;
-            set
-            {
-                _dstMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输出图像
 
         #region 形态学操作
 
         public ObservableCollection<MorphologicalOperation> Operations { get; } = new ObservableCollection<MorphologicalOperation>();
-
-        public ICommand MorphologicalCommand { get; }
 
         private void InitOperations()
         {
@@ -120,6 +93,7 @@ namespace ImageHandle.ViewModels
             });
         }
 
+        [RelayCommand]
         private void ProcessMorphologicalOperations(MorphologicalMode mode)
         {
             if (string.IsNullOrEmpty(_srcImagePath))

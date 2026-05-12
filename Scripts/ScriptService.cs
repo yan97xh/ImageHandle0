@@ -1,4 +1,6 @@
-﻿namespace ImageHandle.Scripts
+﻿using Newtonsoft.Json;
+
+namespace ImageHandle.Scripts
 {
     public class ScriptService
     {
@@ -42,7 +44,10 @@
             {
                 throw new ArgumentException($"方法未注册: {methodName}");
             }
-            return scriptMethod.Parameters;
+
+            List<ScriptParamModel> modelList = scriptMethod.Parameters.Select(param => param.DeepClone()).ToList();
+            
+            return modelList;
         }
 
         public List<string> GetRegisteredMethodNames(bool _iscn = false)

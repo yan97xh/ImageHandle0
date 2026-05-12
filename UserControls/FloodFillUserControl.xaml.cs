@@ -1,4 +1,5 @@
-﻿using ImageHandle.ViewModels;
+﻿using ImageHandle.Attributes;
+using ImageHandle.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -8,6 +9,7 @@ namespace ImageHandle.UserControls
     /// <summary>
     /// FloodFillUserControl.xaml 的交互逻辑
     /// </summary>
+    [NavigationPage(Models.PageEnum.FloodFillPage)]
     public partial class FloodFillUserControl : UserControl
     {
         private FloodFillViewModel _viewModel;

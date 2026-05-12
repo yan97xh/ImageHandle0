@@ -1,4 +1,6 @@
-﻿using ImageHandle.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ImageHandle.Helpers;
 using ImageHandle.Models;
 using ImageHandle.Views;
 using OpenCvSharp;
@@ -9,66 +11,32 @@ using System.Windows.Input;
 
 namespace ImageHandle.ViewModels
 {
-    public class FeatureDetectViewModel : ViewModelBase
+    public partial class FeatureDetectViewModel : ObservableObject
     {
         public FeatureDetectViewModel()
         {
-            FeatureDetectCommand = new Commands.Command<FeatureDetectMode>(ProcessOperations);
             InitOperations();
-
-            FeatureDetectPointCommand = new Commands.RelayCommand(ProcessFeatureDetectPoint);
-
-            ShowHSVRangeWindowCommand = new Commands.RelayCommand(ShowHSVRangeWindow);
-            HSVRangeDetectCommand = new Commands.RelayCommand(HSVRangeDetect);
         }
 
-        #region 输入图像
-
+        [ObservableProperty]
         private string _srcImagePath;
 
-        public string SrcImagePath
-        {
-            get => _srcImagePath;
-            set
-            {
-                _srcImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入图像
-
-        #region 输出图像
-
+        [ObservableProperty]
         private Mat _dstMat;
-
-        public Mat DstMat
-        {
-            get => _dstMat;
-            set
-            {
-                _dstMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输出图像
 
         #region 特征检测
 
         public ObservableCollection<ImgFeatureDetectOp> Operations { get; } =
             new ObservableCollection<ImgFeatureDetectOp>();
 
-        public ICommand FeatureDetectCommand { get; }
-
         private void InitOperations()
         {
             Operations.Add(new ImgFeatureDetectOp()
-                           {
-                               DisplayName = "霍夫圆检测",
-                               operation = FeatureDetectMode.HoughCircle,
-                               Remark = "霍夫圆检测",
-                               ParamValueList =
+            {
+                DisplayName = "霍夫圆检测",
+                operation = FeatureDetectMode.HoughCircle,
+                Remark = "霍夫圆检测",
+                ParamValueList =
                                [
                                    new ParamValueModel("dp", "1.0", "dp参数", "累加器分辨率与图像分辨率的反比"),
                                    new ParamValueModel("param1", "70", "param1", "第一个方法特定参数，canny边缘检测阈值"),
@@ -77,13 +45,13 @@ namespace ImageHandle.ViewModels
                                    new ParamValueModel("minRadius", "10", "最小半径"),
                                    new ParamValueModel("maxRadius", "60", "最大半径")
                                ]
-                           });
+            });
             Operations.Add(new ImgFeatureDetectOp()
-                           {
-                               DisplayName = "霍夫直线检测",
-                               operation = FeatureDetectMode.HoughLine,
-                               Remark = "霍夫直线检测",
-                               ParamValueList =
+            {
+                DisplayName = "霍夫直线检测",
+                operation = FeatureDetectMode.HoughLine,
+                Remark = "霍夫直线检测",
+                ParamValueList =
                                [
                                    new ParamValueModel("rho", "1.6", "rho"),
                                    new ParamValueModel("maxDist", "50", "最大间距", "检测直线最大间距"),
@@ -91,13 +59,13 @@ namespace ImageHandle.ViewModels
                                    new ParamValueModel("threshold", "90", "阈值参数"),
                                    new ParamValueModel("minLength", "80", "最小长度")
                                ]
-                           });
+            });
             Operations.Add(new ImgFeatureDetectOp()
-                           {
-                               DisplayName = "角点检测",
-                               operation = FeatureDetectMode.Corner,
-                               Remark = "角点检测",
-                               ParamValueList =
+            {
+                DisplayName = "角点检测",
+                operation = FeatureDetectMode.Corner,
+                Remark = "角点检测",
+                ParamValueList =
                                [
                                    new ParamValueModel("maxCorners", "100", "最大角点数"),
                                    new ParamValueModel("qualityLv", "0.01", "质量水平"),
@@ -105,26 +73,27 @@ namespace ImageHandle.ViewModels
                                    new ParamValueModel("blockSize", "16", "矩形大小"),
                                    new ParamValueModel("paramK", "50", "探测器参数")
                                ],
-                               ParamBoolList =
+                ParamBoolList =
                                [
                                    new ParamBoolModel("useHarris", false, "探测器启用")
                                ],
-                           });
+            });
             Operations.Add(new ImgFeatureDetectOp()
-                           {
-                               DisplayName = "亚像素矩阵",
-                               operation = FeatureDetectMode.RectSubPix,
-                               Remark = "亚像素矩阵提取",
-                               ParamValueList =
+            {
+                DisplayName = "亚像素矩阵",
+                operation = FeatureDetectMode.RectSubPix,
+                Remark = "亚像素矩阵提取",
+                ParamValueList =
                                [
                                    new ParamValueModel("rectWidth", "100", "矩形宽度"),
                                    new ParamValueModel("rectHeight", "100", "矩形高度"),
                                    new ParamValueModel("rectCenterX", "50", "矩形中心点X"),
                                    new ParamValueModel("rectCenterY", "50", "矩形中心点Y")
                                ]
-                           });
+            });
         }
 
+        [RelayCommand]
         private void ProcessOperations(FeatureDetectMode detectMode)
         {
             if (string.IsNullOrEmpty(_srcImagePath))
@@ -153,33 +122,33 @@ namespace ImageHandle.ViewModels
             switch (detectMode)
             {
                 case FeatureDetectMode.HoughCircle:
-                {
-                    (result, msg) = HoughCircle(op, srcImg);
-                }
+                    {
+                        (result, msg) = HoughCircle(op, srcImg);
+                    }
                     break;
 
                 case FeatureDetectMode.HoughLine:
-                {
-                    (result, msg) = HoughLine(op, srcImg);
-                }
+                    {
+                        (result, msg) = HoughLine(op, srcImg);
+                    }
                     break;
 
                 case FeatureDetectMode.Corner:
-                {
-                    (result, msg) = Conner(op, srcImg);
-                }
+                    {
+                        (result, msg) = Conner(op, srcImg);
+                    }
                     break;
 
                 case FeatureDetectMode.RectSubPix:
-                {
-                    (result, msg) = RectSubPix(op, srcImg); 
-                }
+                    {
+                        (result, msg) = RectSubPix(op, srcImg);
+                    }
                     break;
             }
 
             if (result == false)
             {
-                MessageBox.Show(msg);   
+                MessageBox.Show(msg);
             }
         }
 
@@ -345,8 +314,7 @@ namespace ImageHandle.ViewModels
 
         public FeatureDetectPointModel FeatureDetectPointModel { get; set; } = new FeatureDetectPointModel();
 
-        public ICommand FeatureDetectPointCommand { get; }
-
+        [RelayCommand]
         private void ProcessFeatureDetectPoint()
         {
             if (string.IsNullOrEmpty(_srcImagePath))
@@ -370,101 +338,80 @@ namespace ImageHandle.ViewModels
 
         #region HSV范围提取
 
+        [ObservableProperty]
         private int _h_min = 0;
+
+        [ObservableProperty]
         private int _h_max = 180;
+
+        [ObservableProperty]
         private int _s_min = 0;
+
+        [ObservableProperty]
         private int _s_max = 255;
+
+        [ObservableProperty]
         private int _v_min = 0;
+
+        [ObservableProperty]
         private int _v_max = 255;
 
-        public int H_min
+        partial void OnH_minChanged(int value)
         {
-            get => _h_min;
-            set
+            if (H_min > H_max && H_min != H_max)
             {
-                if (value <= _h_max)
-                {
-                    _h_min = value;
-                    OnPropertyChanged();
-                }
+                H_min = H_max;
             }
         }
 
-        public int H_max
+        partial void OnH_maxChanged(int value)
         {
-            get => _h_max;
-            set
+            if (H_max < H_min && H_max != H_min)
             {
-                if (value >= _h_min)
-                {
-                    _h_max = value;
-                    OnPropertyChanged();
-                }
+                H_max = H_min;
             }
         }
 
-        public int S_min
+        partial void OnS_minChanged(int value)
         {
-            get => _s_min;
-            set
+            if (S_min > S_max && S_min != S_max)
             {
-                if (value <= _s_max)
-                {
-                    _s_min = value;
-                    OnPropertyChanged();
-                }
+                S_min = S_max;
             }
         }
 
-        public int S_max
+        partial void OnS_maxChanged(int value)
         {
-            get => _s_max;
-            set
+            if (S_max < S_min && S_max != S_min)
             {
-                if (value >= _s_min)
-                {
-                    _s_max = value;
-                    OnPropertyChanged();
-                }
+                S_max = S_min;
             }
         }
 
-        public int V_min
+        partial void OnV_minChanged(int value)
         {
-            get => _v_min;
-            set
+            if (V_min > V_max && V_min != V_max)
             {
-                if (value <= _v_max)
-                {
-                    _v_min = value;
-                    OnPropertyChanged();
-                }
+                V_min = V_max;
             }
         }
 
-        public int V_max
+        partial void OnV_maxChanged(int value)
         {
-            get => _v_max;
-            set
+            if (V_max < V_min && V_max != V_min)
             {
-                if (value >= _v_min)
-                {
-                    _v_max = value;
-                    OnPropertyChanged();
-                }
+                V_max = V_min;
             }
         }
 
-        public ICommand ShowHSVRangeWindowCommand { get; }
-
+        [RelayCommand]
         private void ShowHSVRangeWindow()
         {
             HSVRangeWindow rangeWindow = new HSVRangeWindow();
             rangeWindow.ShowDialog();
         }
 
-        public ICommand HSVRangeDetectCommand { get; }
-
+        [RelayCommand]
         private void HSVRangeDetect()
         {
             if (string.IsNullOrEmpty(_srcImagePath))

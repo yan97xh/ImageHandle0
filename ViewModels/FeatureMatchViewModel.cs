@@ -1,4 +1,6 @@
-﻿using ImageHandle.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ImageHandle.Helpers;
 using ImageHandle.Models;
 using OpenCvSharp;
 using System.IO;
@@ -7,103 +9,37 @@ using System.Windows.Input;
 
 namespace ImageHandle.ViewModels
 {
-    public class FeatureMatchViewModel : ViewModelBase
+    public partial class FeatureMatchViewModel : ObservableObject
     {
         public FeatureMatchViewModel()
         {
-            MatcherModeArr = Enum.GetNames(typeof(MatcherMode));
-
-            FeatureMatchCommand = new Commands.Command<FeatureMatchMode>(ProcessFeatureMatch);
         }
 
-        #region 输入图像
-
+        [ObservableProperty]
         private string _srcImagePath1;
 
-        public string SrcImagePath1
-        {
-            get => _srcImagePath1;
-            set
-            {
-                _srcImagePath1 = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private string _srcImagePath2;
 
-        public string SrcImagePath2
-        {
-            get => _srcImagePath2;
-            set
-            {
-                _srcImagePath2 = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入图像
-
-        #region 输出图像
-
+        [ObservableProperty]
         private FeatureMatchResModel _featureMatchResModel = new FeatureMatchResModel();
 
-        public FeatureMatchResModel FeatureMatchResModel
-        {
-            get => _featureMatchResModel;
-            set
-            {
-                _featureMatchResModel = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输出图像
-
-        #region 匹配距离参数
-
+        [ObservableProperty]
         private double _matchDisParam = 10.0;
 
-        public double MatchDisParam
+        partial void OnMatchDisParamChanged(double value)
         {
-            get => _matchDisParam;
-            set
+            if (value <= 0 && Math.Abs(_matchDisParam - 1) > 0.0001)
             {
-                if (value <= 0)
-                {
-                    _matchDisParam = 1;
-                }
-                else
-                {
-                    _matchDisParam = value;
-                }
-
-                OnPropertyChanged();
+                // 重新赋值为 1
+                MatchDisParam = 1;
             }
         }
 
-        #endregion 匹配距离参数
+        [ObservableProperty]
+        private string _matcherMode; // 匹配器类型
 
-        #region 匹配器类型
-
-        private string _matcherMode;
-
-        public string MatcherMode
-        {
-            get => _matcherMode;
-            set
-            {
-                _matcherMode = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string[] MatcherModeArr { get; }
-
-        #endregion 匹配器类型
-
-        public ICommand FeatureMatchCommand { get; }
-
+        [RelayCommand]
         private void ProcessFeatureMatch(FeatureMatchMode operation)
         {
             if (string.IsNullOrEmpty(_srcImagePath1))
@@ -144,15 +80,15 @@ namespace ImageHandle.ViewModels
             switch (operation)
             {
                 case FeatureMatchMode.SIFT:
-                {
-                    FeatureMatchResModel = ImageOperateMethods.SIFTMatch(srcImg1, srcImg2, _matcher, _matchDisParam);
-                }
+                    {
+                        FeatureMatchResModel = ImageOperateMethods.SIFTMatch(srcImg1, srcImg2, _matcher, _matchDisParam);
+                    }
                     break;
 
                 case FeatureMatchMode.SURF:
-                {
-                    FeatureMatchResModel = ImageOperateMethods.SURFMatch(srcImg1, srcImg2, _matcher, _matchDisParam);
-                }
+                    {
+                        FeatureMatchResModel = ImageOperateMethods.SURFMatch(srcImg1, srcImg2, _matcher, _matchDisParam);
+                    }
                     break;
             }
         }

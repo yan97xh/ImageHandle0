@@ -1,73 +1,28 @@
-﻿using Microsoft.Win32;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using OpenCvSharp;
 using System.IO;
 using System.Windows;
-using System.Windows.Input;
 
 namespace ImageHandle.ViewModels
 {
-    public class TemplateMatchViewModel : ViewModelBase
+    public partial class TemplateMatchViewModel : ObservableObject
     {
         public TemplateMatchViewModel()
         {
-            SelectSrcImgCommand = new Commands.RelayCommand(SelectSrcImg);
-            SaveImageCommand = new Commands.RelayCommand(SaveImage);
-            SelectTemplateImgCommand = new Commands.RelayCommand(SelectTemplateImg);
-
-            TemplateMatchModeArray = Enum.GetNames(typeof(OpenCvSharp.TemplateMatchModes));
-            TemplateMatchSingle = new Commands.RelayCommand(ProcessTemplateMatchSingle);
-            TemplateMatchMultiCommand = new Commands.RelayCommand(ProcessTemplateMatchMulti);
-            TemplateMatchCircleCommand = new Commands.RelayCommand(ProcessTemplateMatchCircle);
         }
 
-        #region 输入图像
-
+        [ObservableProperty]
         private string _srcImagePath;
 
-        public string SrcImagePath
-        {
-            get => _srcImagePath;
-            set
-            {
-                _srcImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入图像
-
-        #region 输出图像
-
+        [ObservableProperty]
         private Mat _dstMat;
 
-        public Mat DstMat
-        {
-            get => _dstMat;
-            set
-            {
-                _dstMat = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private string _saveImagePath;
 
-        public string SaveImagePath
-        {
-            get => _saveImagePath;
-            set
-            {
-                _saveImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输出图像
-
-        #region 选择输入图像命令
-
-        public ICommand SelectSrcImgCommand { get; }
-
+        [RelayCommand]
         private void SelectSrcImg()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -84,12 +39,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择输入图像命令
-
-        #region 保存输出图像命令
-
-        public ICommand SaveImageCommand { get; }
-
+        [RelayCommand]
         private void SaveImage()
         {
             if (DstMat == null)
@@ -121,28 +71,10 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 保存输出图像命令
-
-        #region 模版图像
-
+        [ObservableProperty]
         private Mat _templateMat;
 
-        public Mat TemplateMat
-        {
-            get => _templateMat;
-            set
-            {
-                _templateMat = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 模版图像
-
-        #region 选择模版图像命令
-
-        public ICommand SelectTemplateImgCommand { get; }
-
+        [RelayCommand]
         private void SelectTemplateImg()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -158,49 +90,27 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择模版图像命令
-
-        public string[] TemplateMatchModeArray { get; }
-
+        [ObservableProperty]
         private string _templateMatchMode;
 
-        public string TemplateMatchMode
-        {
-            get => _templateMatchMode;
-            set
-            {
-                _templateMatchMode = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private double _multiMatchThreshold = 0.8;
 
-        public double MultiMatchThreshold
+        partial void OnMultiMatchThresholdChanged(double value)
         {
-            get => _multiMatchThreshold;
-            set
+            if (value < 0)
             {
-                if (value < 0)
-                {
-                    _multiMatchThreshold = 0;
-                }
-                else if (value > 1)
-                {
-                    _multiMatchThreshold = 1;
-                }
-                else
-                {
-                    _multiMatchThreshold = value;
-                }
-                OnPropertyChanged();
+                MultiMatchThreshold = 0;
+            }
+            else if (value > 1)
+            {
+                MultiMatchThreshold = 1;
             }
         }
 
         #region 单模版匹配
 
-        public ICommand TemplateMatchSingle { get; }
-
+        [RelayCommand]
         private void ProcessTemplateMatchSingle()
         {
             if (string.IsNullOrEmpty(_srcImagePath))
@@ -264,8 +174,7 @@ namespace ImageHandle.ViewModels
 
         #region 多模版匹配
 
-        public ICommand TemplateMatchMultiCommand { get; }
-
+        [RelayCommand]
         private void ProcessTemplateMatchMulti()
         {
             if (string.IsNullOrEmpty(_srcImagePath))
@@ -328,8 +237,7 @@ namespace ImageHandle.ViewModels
 
         #region 角度模版匹配
 
-        public ICommand TemplateMatchCircleCommand { get; }
-
+        [RelayCommand]
         private void ProcessTemplateMatchCircle()
         {
             if (string.IsNullOrEmpty(_srcImagePath))

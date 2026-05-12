@@ -8,6 +8,7 @@
     xmlns:vm="clr-namespace:ImageHandle.ViewModels"
     xmlns:rule="clr-namespace:ImageHandle.ValidationRules"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:ex="clr-namespace:ImageHandle.Extensions"
     xmlns:models="clr-namespace:ImageHandle.Models"
     Width="1450"
     Height="840"
@@ -154,7 +155,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     IsEditable="False"
-                    ItemsSource="{Binding MatcherModeArr}"
+                    ItemsSource="{ex:EnumBindingSource EnumType=models:MatcherMode}"
                     SelectedIndex="0"
                     Style="{StaticResource ParameterizedComboBoxStyle}"
                     Background="#495660"
@@ -170,7 +171,7 @@
                             Style="{StaticResource ImgOperateBtnStyle}"
                             Content="{Binding Path=.}"
                             CommandParameter="{Binding Path=.}"
-                            Command="{Binding DataContext.FeatureMatchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
+                            Command="{Binding DataContext.ProcessFeatureMatchCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>

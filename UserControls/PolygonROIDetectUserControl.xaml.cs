@@ -1,4 +1,5 @@
-﻿using ImageHandle.ViewModels;
+﻿using ImageHandle.Attributes;
+using ImageHandle.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -7,6 +8,7 @@ namespace ImageHandle.UserControls
     /// <summary>
     /// ROIDetectUserControl.xaml 的交互逻辑
     /// </summary>
+    [NavigationPage(Models.PageEnum.PolyROIDetectPage)]
     public partial class PolygonROIDetectUserControl : UserControl
     {
         private PolygonROIDetectViewModel _viewModel;

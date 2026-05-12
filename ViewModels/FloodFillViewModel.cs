@@ -1,4 +1,6 @@
-﻿using ImageHandle.Models;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ImageHandle.Models;
 using Microsoft.Win32;
 using OpenCvSharp;
 using System.Collections.ObjectModel;
@@ -9,67 +11,27 @@ using System.Windows.Media;
 
 namespace ImageHandle.ViewModels
 {
-    public class FloodFillViewModel : ViewModelBase
+    public partial class FloodFillViewModel : ObservableObject
     {
         public FloodFillViewModel()
         {
-            SelectSrcImgCommand = new Commands.RelayCommand(SelectSrcImg);
-            FloodFillColorCommand = new Commands.RelayCommand(ProcessFloodFillColor);
-            SaveImageCommand = new Commands.RelayCommand(SaveImage);
-
             _matCollection = new ObservableCollection<Mat>();
             _matCollection.CollectionChanged += OnCollectionChanged;
-
-            ToggleCoordinateModeCommand = new Commands.RelayCommand(ToggleCoordinateMode);
-
-            FloodFillCommand = new Commands.RelayCommand(ProcessFloodFill);
-            RevocationCommand = new Commands.RelayCommand(ProcessRevocation);
-            RecoverCommand = new Commands.RelayCommand(Recover);
         }
 
-        #region 输入输出图像路径
-
+        [ObservableProperty]
         private string _srcImgPath;
 
-        public string SrcImgPath
-        {
-            get => _srcImgPath;
-            set
-            {
-                _srcImgPath = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private string _saveImagePath;
-
-        public string SaveImagePath
-        {
-            get => _saveImagePath;
-            set
-            {
-                _saveImagePath = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 输入输出图像路径
 
         #region 图像集合 用于保存每步操作 可撤销
 
         private ObservableCollection<Mat> _matCollection = new ObservableCollection<Mat>();
         public ObservableCollection<Mat> MatCollection => _matCollection;
-        private Mat _lastMat;
 
-        public Mat LastMat
-        {
-            get => _lastMat;
-            set
-            {
-                _lastMat = value;
-                OnPropertyChanged();
-            }
-        }
+        [ObservableProperty]
+        private Mat _lastMat;
 
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -94,10 +56,7 @@ namespace ImageHandle.ViewModels
 
         #endregion 图像集合 用于保存每步操作 可撤销
 
-        #region 选择输入图像命令
-
-        public ICommand SelectSrcImgCommand { get; }
-
+        [RelayCommand]
         private void SelectSrcImg()
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -121,12 +80,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择输入图像命令
-
-        #region 保存输出图像命令
-
-        public ICommand SaveImageCommand { get; }
-
+        [RelayCommand]
         private void SaveImage()
         {
             if (LastMat == null)
@@ -158,24 +112,10 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 保存输出图像命令
-
+        [ObservableProperty]
         private System.Windows.Media.Color _floodFillColor = Colors.Red;
 
-        public System.Windows.Media.Color FloodFillColor
-        {
-            get { return _floodFillColor; }
-            set
-            {
-                _floodFillColor = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #region 选择颜色的命令
-
-        public ICommand FloodFillColorCommand { get; }
-
+        [RelayCommand]
         private void ProcessFloodFillColor()
         {
             var colorDialog = new System.Windows.Forms.ColorDialog();
@@ -191,35 +131,11 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        #endregion 选择颜色的命令
-
-        #region 正负差值
-
+        [ObservableProperty]
         private int _downDiff = 0;
 
-        public int DownDiff
-        {
-            get => _downDiff;
-            set
-            {
-                _downDiff = value;
-                OnPropertyChanged();
-            }
-        }
-
+        [ObservableProperty]
         private int _upDiff = 0;
-
-        public int UpDiff
-        {
-            get => _upDiff;
-            set
-            {
-                _upDiff = value;
-                OnPropertyChanged();
-            }
-        }
-
-        #endregion 正负差值
 
         private bool _isCoordinateModeEnabled = false;
         private CoordinateModel _currentCoordinate = new CoordinateModel();
@@ -279,8 +195,7 @@ namespace ImageHandle.ViewModels
             }
         }
 
-        public ICommand ToggleCoordinateModeCommand { get; }
-
+        [RelayCommand]
         private void ToggleCoordinateMode()
         {
             IsCoordinateModeEnabled = !IsCoordinateModeEnabled;
@@ -353,10 +268,7 @@ namespace ImageHandle.ViewModels
             });
         }
 
-        #region 水漫命令
-
-        public ICommand FloodFillCommand { get; }
-
+        [RelayCommand]
         private void ProcessFloodFill()
         {
             if (LastMat == null)
@@ -423,12 +335,7 @@ namespace ImageHandle.ViewModels
             return true;
         }
 
-        #endregion 水漫命令
-
-        #region 撤销命令
-
-        public ICommand RevocationCommand { get; }
-
+        [RelayCommand]
         private void ProcessRevocation()
         {
             Pop();
@@ -440,12 +347,7 @@ namespace ImageHandle.ViewModels
             CurrentCoordinate.Y = 0;
         }
 
-        #endregion 撤销命令
-
-        #region 复原命令
-
-        public ICommand RecoverCommand { get; }
-
+        [RelayCommand]
         private void Recover()
         {
             if (_matCollection.Count <= 0)
@@ -464,7 +366,5 @@ namespace ImageHandle.ViewModels
             CurrentCoordinate.X = 0;
             CurrentCoordinate.Y = 0;
         }
-
-        #endregion 复原命令
     }
 }

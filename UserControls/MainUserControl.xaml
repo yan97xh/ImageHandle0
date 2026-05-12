@@ -8,6 +8,7 @@
     xmlns:vm="clr-namespace:ImageHandle.ViewModels"
     xmlns:models="clr-namespace:ImageHandle.Models"
     xmlns:converters="clr-namespace:ImageHandle.Converters"
+    xmlns:ex="clr-namespace:ImageHandle.Extensions"
     Width="1450"
     Height="840"
     d:DesignHeight="840"
@@ -39,7 +40,7 @@
                         <Button
                             Width="140"
                             Style="{StaticResource ImgOperateBtnStyle}"
-                            Command="{Binding DataContext.NoneParamOpCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                            Command="{Binding DataContext.ProcessImageNoneParamCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                             Content="{Binding DisplayName}"
                             FontSize="16"
                             CommandParameter="{Binding OperationType}" />
@@ -78,7 +79,7 @@
                                             VerticalAlignment="Center"
                                             TextAlignment="Center"
                                             ToolTip="{Binding ParamToolText, Converter={StaticResource emptyStringToNullConverter}}"
-                                            Text="{Binding InputParam, UpdateSourceTrigger=PropertyChanged}" /> 
+                                            Text="{Binding InputParam, UpdateSourceTrigger=PropertyChanged}" />
                                         <Button
                                             Grid.Column="2"
                                             Width="120"
@@ -88,7 +89,7 @@
                                             FontSize="16"
                                             Style="{StaticResource ImgOperateBtnStyle}"
                                             Content="{Binding ButtonText}"
-                                            Command="{Binding DataContext.OneParamNumOpCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Command="{Binding DataContext.ProcessImageOneParamNumCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                             CommandParameter="{Binding OperationType}" />
                                     </StackPanel>
                                 </Border>
@@ -140,6 +141,7 @@
                                             Foreground="White"
                                             ToolTip="{Binding ParamToolText, Converter={StaticResource emptyStringToNullConverter}}"
                                             Text="{Binding InputParam, UpdateSourceTrigger=PropertyChanged}" />
+
                                         <Button
                                             Grid.Column="2"
                                             Width="100"
@@ -149,7 +151,7 @@
                                             FontSize="16"
                                             Style="{StaticResource ImgOperateBtnStyle}"
                                             Content="{Binding ButtonText}"
-                                            Command="{Binding DataContext.OneParamEnumOpCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            Command="{Binding DataContext.ProcessImageOneParamEnumCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                             CommandParameter="{Binding OperationType}" />
                                     </StackPanel>
                                 </Border>

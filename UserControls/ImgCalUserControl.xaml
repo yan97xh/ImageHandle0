@@ -7,6 +7,8 @@
     xmlns:local="clr-namespace:ImageHandle.UserControls"
     xmlns:vm="clr-namespace:ImageHandle.ViewModels"
     xmlns:cvert="clr-namespace:ImageHandle.Converters"
+    xmlns:ex="clr-namespace:ImageHandle.Extensions"
+    xmlns:models="clr-namespace:ImageHandle.Models"
     Width="1450"
     Height="840"
     d:DesignHeight="840"
@@ -61,7 +63,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     IsEditable="False"
-                    ItemsSource="{Binding ImageArr}"
+                    ItemsSource="{ex:EnumBindingSource EnumType=models:MatOpName}"
                     SelectedIndex="0"
                     Style="{StaticResource ParameterizedComboBoxStyle}"
                     Background="#495660"
@@ -79,7 +81,7 @@
                                 Width="120"
                                 Style="{StaticResource ImgOperateBtnStyle}"
                                 Content="{Binding DisplayName}"
-                                Command="{Binding DataContext.TwoMatOpCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                Command="{Binding DataContext.ProcessImageTwoMatCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                 CommandParameter="{Binding operationEnum}"
                                 ToolTip="{Binding Remark}" />
                             <ItemsControl ItemsSource="{Binding ParamList}">
@@ -135,7 +137,7 @@
                                 Width="120"
                                 Style="{StaticResource ImgOperateBtnStyle}"
                                 Content="{Binding DisplayName}"
-                                Command="{Binding DataContext.OneMatOpCommand1, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                Command="{Binding DataContext.ProcessImageOneMat1Command, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                 CommandParameter="{Binding operationEnum}"
                                 ToolTip="{Binding Remark}" />
                             <ItemsControl ItemsSource="{Binding ParamList}">
@@ -191,7 +193,7 @@
                                 Width="120"
                                 Style="{StaticResource ImgOperateBtnStyle}"
                                 Content="{Binding DisplayName}"
-                                Command="{Binding DataContext.OneMatOpCommand2, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                Command="{Binding DataContext.ProcessImageOneMat2Command, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                 CommandParameter="{Binding operationEnum}"
                                 ToolTip="{Binding Remark}" />
                             <ItemsControl ItemsSource="{Binding ParamList}">
@@ -263,7 +265,7 @@
                                     Margin="0,0,15,5"
                                     Style="{StaticResource ImgOperateBtnStyle}"
                                     Content="{Binding DisplayName}"
-                                    Command="{Binding DataContext.SimilarityCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                    Command="{Binding DataContext.ProcessSimilarityOperationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                     CommandParameter="{Binding similarityOperation}"
                                     ToolTip="{Binding Reamrk, Converter={StaticResource emptyStringToNullConverter}}" />
                             </StackPanel>
@@ -329,7 +331,7 @@
                                         FontSize="16"
                                         Style="{StaticResource ImgOperateBtnStyle}"
                                         Content="{Binding ButtonText}"
-                                        Command="{Binding DataContext.TwoMatOneEnumCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                        Command="{Binding DataContext.ProcessConcatOperationCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
                                         CommandParameter="{Binding OperationType}" />
                                 </StackPanel>
                             </Border>
